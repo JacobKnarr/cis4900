@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Initialize the associated SharedPreferences file with default values
         PreferenceManager.setDefaultValues(this, R.xml.prefs, false);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
