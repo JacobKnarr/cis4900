@@ -1,6 +1,7 @@
 package cz.martykan.forecastie.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -913,6 +914,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         );
     }
 
+    @SuppressLint("StringFormatInvalid")
     private void updateLastUpdateTime(long timeInMillis) {
         if (timeInMillis < 0) {
             // No time
