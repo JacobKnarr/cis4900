@@ -606,7 +606,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         int id = item.getItemId();
 
         if (id == R.id.action_camera) {
-            
+            Intent intent = new Intent(MainActivity.this, CameraActivity.class);
+            startActivity(intent);
         }
         if (id == R.id.action_refresh) {
             if (isNetworkAvailable()) {
