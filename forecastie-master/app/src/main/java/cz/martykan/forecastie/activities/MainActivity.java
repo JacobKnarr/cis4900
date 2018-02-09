@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private static Map<String, Integer> pressUnits = new HashMap<>(3);
     private static boolean mappingsInitialised = false;
 
+
     Typeface weatherFont;
     Weather todayWeather = new Weather();
 
@@ -604,6 +605,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.action_camera) {
+            
+        }
         if (id == R.id.action_refresh) {
             if (isNetworkAvailable()) {
                 getTodayWeather();
