@@ -18,6 +18,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -33,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -606,8 +608,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         int id = item.getItemId();
 
         if (id == R.id.action_camera) {
-            Intent intent = new Intent(MainActivity.this, CameraActivity.class);
-            startActivity(intent);
         }
         if (id == R.id.action_refresh) {
             if (isNetworkAvailable()) {
