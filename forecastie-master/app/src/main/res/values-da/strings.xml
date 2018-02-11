@@ -22,8 +22,8 @@
 
     <string name="search_title">Søg efter by</string>
 
-    <string name="downloading_data">Henter dine data ...</string>
-    <string name="getting_location">Henter din placering ...</string>
+    <string name="downloading_data">Henter dine data …</string>
+    <string name="getting_location">Henter din placering …</string>
 
     <string name="error_dateFormat">Dato format fejl</string>
 
@@ -121,4 +121,6 @@
     <string name="rain">Regn</string>
     <string name="temperature">Temperatur</string>
     <string name="action_graphs">Grafer</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

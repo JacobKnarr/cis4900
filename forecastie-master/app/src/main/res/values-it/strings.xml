@@ -21,8 +21,8 @@
 
     <string name="search_title">Cerca città</string>
 
-    <string name="downloading_data">Download dati in corso ...</string>
-    <string name="getting_location">Geolocalizzazione in corso ...</string>
+    <string name="downloading_data">Download dati in corso …</string>
+    <string name="getting_location">Geolocalizzazione in corso …</string>
 
     <string name="error_dateFormat">ERRORE FORMATO DATA</string>
 
@@ -124,4 +124,6 @@
     <string name="rain">Pioggia</string>
     <string name="temperature">Temperatura</string>
     <string name="action_graphs">Grafici</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

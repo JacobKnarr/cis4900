@@ -20,8 +20,21 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter android:label="@string/filter_title_viewforecastie">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/forecastie” -->
+                <data android:scheme="http"
+                    android:host="www.example.com"
+                    android:pathPrefix="/forecastie" />
+                <!-- note that the leading "/" is required for pathPrefix-->
+                <!-- Accepts URIs that begin with "example://forecastie” -->
+                <data android:scheme="example"
+                    android:host="forecastie" />
             </intent-filter>
         </activity>
         <activity

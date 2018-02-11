@@ -21,8 +21,8 @@
 
 		<string name="search_title">Wyszukaj miejscowość</string>
 
-    <string name="downloading_data">Pobieranie danych...</string>
-		<string name="getting_location">Wyszukiwanie lokalizacji...</string>
+    <string name="downloading_data">Pobieranie danych…</string>
+		<string name="getting_location">Wyszukiwanie lokalizacji…</string>
 		
 		<string name="error_dateFormat">Błąd pobierania danych</string>
 		
@@ -123,4 +123,6 @@
     <string name="rain">Deszcz</string>
     <string name="temperature">Temperatura</string>
     <string name="action_graphs">Wykresy</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

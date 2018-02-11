@@ -22,8 +22,8 @@
 
     <string name="search_title">Search for city</string>
 
-    <string name="downloading_data">Downloading your data ...</string>
-    <string name="getting_location">Getting your location ...</string>
+    <string name="downloading_data">Downloading your data …</string>
+    <string name="getting_location">Getting your location …</string>
 
     <string name="error_dateFormat">DATE FORMAT ERROR</string>
 
@@ -134,4 +134,6 @@
     <string name="rain">Rain</string>
     <string name="temperature">Temperature</string>
     <string name="action_graphs">Graphs</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

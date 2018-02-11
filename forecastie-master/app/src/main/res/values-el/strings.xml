@@ -12,7 +12,7 @@
     <string name="dash_clock_status">%1$s°%2$s</string>
     <string name="dialog_cancel">Ακύρωση</string>
     <string name="dialog_ok">ΟΚ</string>
-    <string name="downloading_data">Downloading your data ...</string>
+    <string name="downloading_data">Downloading your data …</string>
     <string name="error_dateFormat">ΛΑΝΘΑΣΜΕΝΗ ΜΟΡΦΗ ΔΕΔΟΜΕΝΩΝ</string>
     <string name="getting_location">Εύρεση τοποθεσίας</string>
     <string name="humidity">Υγρασία</string>
@@ -97,4 +97,6 @@
     <string name="wind_direction_west">Δ</string>
     <string name="wind_direction_west_north_west">ΔΝΔ</string>
     <string name="wind_direction_west_south_west">ΔΝΔ</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

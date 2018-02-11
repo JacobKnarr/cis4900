@@ -22,8 +22,8 @@ Pembaruan terakhir: %s</string>
 
     <string name="search_title">Pencarian kota</string>
 
-    <string name="downloading_data">Mengunduh data Anda ...</string>
-    <string name="getting_location">Mendapatkan lokasi Anda ...</string>
+    <string name="downloading_data">Mengunduh data Anda …</string>
+    <string name="getting_location">Mendapatkan lokasi Anda …</string>
 
     <string name="error_dateFormat">DATE FORMAT ERROR</string>
 
@@ -125,5 +125,7 @@ Kelembaban: %7$s %%
     <string name="rain">Hujan</string>
     <string name="temperature">Temperatur</string>
     <string name="action_graphs">Grafik</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>
 

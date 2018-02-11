@@ -18,8 +18,8 @@
 
     <string name="search_title">搜索城市</string>
 
-    <string name="downloading_data">正在下载所需数据 ...</string>
-    <string name="getting_location">正在定位 ...</string>
+    <string name="downloading_data">正在下载所需数据 …</string>
+    <string name="getting_location">正在定位 …</string>
 
     <string name="error_dateFormat">日期格式错误</string>
 
@@ -79,4 +79,5 @@
     <!-- 1: city; 2: country; 3: wind; 4: speed units; 5: pressure; 6: pressure units; 7: humidity -->
     <string name="dash_clock_expanded_body">%1$s, %2$s\n风力: %3$s %4$s\n气压: %5$s %6$s\n湿度: %7$s %%\n</string>
 
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

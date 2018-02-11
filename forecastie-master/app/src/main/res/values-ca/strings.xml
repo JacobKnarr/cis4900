@@ -21,8 +21,8 @@
 
     <string name="search_title">Cerca una ciutat</string>
 
-    <string name="downloading_data">Descarregant dades...</string>
-    <string name="getting_location">Obtenint la seva ubicació...</string>
+    <string name="downloading_data">Descarregant dades…</string>
+    <string name="getting_location">Obtenint la seva ubicació…</string>
     
     <string name="error_dateFormat">ERROR EN EL FORMAT DE DATA</string>
 
@@ -114,4 +114,6 @@
     <string name="location_settings">Paràmetres d\'ubicació</string>
     <string name="location_settings_message">L\'ubicació no esta activada. ¿Vol anar al menú de paràmetres del sistema?</string>
     <string name="location_settings_button">Paràmetres</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>
