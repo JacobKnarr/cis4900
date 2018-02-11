@@ -36,6 +36,7 @@
 
     <ImageView
         android:id="@+id/widgetIcon"
+        android:contentDescription="@string/widget_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -46,7 +47,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:textSize="24sp"
         android:textStyle="bold"
         tools:text="0 °C"
@@ -57,7 +57,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:textSize="16sp"
         tools:text="Clear Sky"
@@ -74,6 +73,7 @@
 
     <ImageButton
         android:id="@+id/widgetButtonRefresh"
+        android:contentDescription="@string/widget_button_refresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"

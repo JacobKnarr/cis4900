@@ -11,17 +11,18 @@
         android:id="@+id/widgetCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:textSize="10sp"
         tools:text="City name, AB"
-        android:textColor="@color/text_light"/>
+        android:textColor="@color/text_light"
+        tools:ignore="SmallSp" />
 
     <TextView
         android:id="@+id/widgetTemperature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/widgetCity"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:textSize="20sp"
         android:textStyle="bold"
         tools:text="0 °C"
@@ -31,19 +32,20 @@
         android:id="@+id/widgetDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:textSize="10sp"
         tools:text="Clear Sky"
-        android:textColor="@color/text_light" />
+        android:textColor="@color/text_light"
+        tools:ignore="SmallSp" />
 
     <ImageView
         android:id="@+id/widgetIcon"
+        android:contentDescription="@string/widget_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/widgetTemperature"
+        android:layout_toEndOf="@id/widgetTemperature"
         tools:src="@drawable/ic_cloud_white_24dp"/>
 
     <TextView
@@ -57,6 +59,7 @@
 
     <ImageButton
         android:id="@+id/widgetButtonRefresh"
+        android:contentDescription="@string/widget_button_refresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"

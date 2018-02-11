@@ -56,7 +56,7 @@ public class GraphActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.graph_toolbar);
+        Toolbar toolbar = findViewById(R.id.graph_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         if (darkTheme) {
@@ -76,7 +76,7 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     private void temperatureGraph() {
-        LineChartView lineChartView = (LineChartView) findViewById(R.id.graph_temperature);
+        LineChartView lineChartView = findViewById(R.id.graph_temperature);
 
         // Data
         LineSet dataset = new LineSet();
@@ -91,7 +91,7 @@ public class GraphActivity extends AppCompatActivity {
                 maxTemp = temperature;
             }
 
-            dataset.addPoint(getDateLabel(weatherList.get(i), i), (float) temperature);
+            dataset.addPoint(getDateLabel(weatherList.get(i), i), temperature);
         }
         dataset.setSmooth(false);
         dataset.setColor(Color.parseColor("#FF5722"));
@@ -108,7 +108,7 @@ public class GraphActivity extends AppCompatActivity {
         paint.setStrokeWidth(1);
         lineChartView.setGrid(ChartView.GridType.HORIZONTAL, paint);
         lineChartView.setBorderSpacing(Tools.fromDpToPx(10));
-        lineChartView.setAxisBorderValues((int) (Math.round(minTemp)) - 1, (int) (Math.round(maxTemp)) + 1);
+        lineChartView.setAxisBorderValues(Math.round(minTemp) - 1, Math.round(maxTemp) + 1);
         lineChartView.setStep(2);
         lineChartView.setXAxis(false);
         lineChartView.setYAxis(false);
@@ -117,7 +117,7 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     private void rainGraph() {
-        LineChartView lineChartView = (LineChartView) findViewById(R.id.graph_rain);
+        LineChartView lineChartView = findViewById(R.id.graph_rain);
 
         // Data
         LineSet dataset = new LineSet();
@@ -149,7 +149,7 @@ public class GraphActivity extends AppCompatActivity {
         paint.setStrokeWidth(1);
         lineChartView.setGrid(ChartView.GridType.HORIZONTAL, paint);
         lineChartView.setBorderSpacing(Tools.fromDpToPx(10));
-        lineChartView.setAxisBorderValues(0, (int) (Math.round(maxRain)) + 1);
+        lineChartView.setAxisBorderValues(0, Math.round(maxRain) + 1);
         lineChartView.setStep(1);
         lineChartView.setXAxis(false);
         lineChartView.setYAxis(false);
@@ -158,7 +158,7 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     private void pressureGraph() {
-        LineChartView lineChartView = (LineChartView) findViewById(R.id.graph_pressure);
+        LineChartView lineChartView = findViewById(R.id.graph_pressure);
 
         // Data
         LineSet dataset = new LineSet();

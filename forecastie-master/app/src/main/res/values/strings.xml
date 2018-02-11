@@ -20,6 +20,9 @@
     <string name="last_update">Last update:\n%s</string>
     <string name="last_update_widget">\nLast update: %s</string>
 
+    <string name="widget_button_refresh">Refresh Button</string>
+    <string name="widget_icon">Widget Icon</string>
+
     <string name="search_title">Search for city</string>
 
     <string name="downloading_data">Downloading your data …</string>

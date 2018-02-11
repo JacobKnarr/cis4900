@@ -40,7 +40,7 @@ public class DashClockWeatherExtension extends DashClockExtension {
             JSONObject reader = new JSONObject(result);
 
             // Temperature
-            float temperature = UnitConvertor.convertTemperature(Float.parseFloat(reader.optJSONObject("main").getString("temp").toString()), sp);
+            float temperature = UnitConvertor.convertTemperature(Float.parseFloat(reader.optJSONObject("main").getString("temp")), sp);
             if (sp.getBoolean("temperatureInteger", false)) {
                 temperature = Math.round(temperature);
             }
@@ -48,7 +48,7 @@ public class DashClockWeatherExtension extends DashClockExtension {
             // Wind
             double wind;
             try {
-                wind = Double.parseDouble(reader.optJSONObject("wind").getString("speed").toString());
+                wind = Double.parseDouble(reader.optJSONObject("wind").getString("speed"));
             } catch (Exception e) {
                 e.printStackTrace();
                 wind = 0;
@@ -56,7 +56,7 @@ public class DashClockWeatherExtension extends DashClockExtension {
             wind = UnitConvertor.convertWind(wind, sp);
 
             // Pressure
-            double pressure = UnitConvertor.convertPressure((float) Double.parseDouble(reader.optJSONObject("main").getString("pressure").toString()), sp);
+            double pressure = UnitConvertor.convertPressure((float) Double.parseDouble(reader.optJSONObject("main").getString("pressure")), sp);
 
             MainActivity.initMappings();
             publishUpdate(new ExtensionData()

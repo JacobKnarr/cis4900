@@ -45,7 +45,8 @@ public class SimpleWidgetProvider extends AbstractWidgetProvider {
             remoteViews.setOnClickPendingIntent(R.id.widgetRoot, pendingIntent2);
 
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-            Weather widgetWeather = new Weather();
+            Weather widgetWeather;
+            new Weather();
             if(!sp.getString("lastToday", "").equals("")) {
                 widgetWeather = parseWidgetJson(sp.getString("lastToday", ""), context);
             }
@@ -97,15 +98,21 @@ public class SimpleWidgetProvider extends AbstractWidgetProvider {
                     android.text.format.DateFormat.getTimeFormat(context).format(new Date(nextUpdate)));
         }
         if (Build.VERSION.SDK_INT >= 19) {
-            alarmManager.setExact(AlarmManager.RTC, nextUpdate, getTimeIntent(context));
+            if (alarmManager != null) {
+                alarmManager.setExact(AlarmManager.RTC, nextUpdate, getTimeIntent(context));
+            }
         } else {
-            alarmManager.set(AlarmManager.RTC, nextUpdate, getTimeIntent(context));
+            if (alarmManager != null) {
+                alarmManager.set(AlarmManager.RTC, nextUpdate, getTimeIntent(context));
+            }
         }
     }
 
     private static void cancelUpdate(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(getTimeIntent(context));
+        if (alarmManager != null) {
+            alarmManager.cancel(getTimeIntent(context));
+        }
     }
 
     private static PendingIntent getTimeIntent(Context context) {
