@@ -21,8 +21,8 @@
 
     <string name="search_title">Пошук міста</string>
 
-    <string name="downloading_data">Завантаження ваших даних ...</string>
-    <string name="getting_location">Визначення місця розташування ...</string>
+    <string name="downloading_data">Завантаження ваших даних …</string>
+    <string name="getting_location">Визначення місця розташування …</string>
 
     <string name="error_dateFormat">НЕКОРЕКТНИЙ ФОРМАТ ДАТИ</string>
 
@@ -120,5 +120,7 @@
     <string name="rain">Дощ</string>
     <string name="temperature">Температура</string>
     <string name="action_graphs">Графіки</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>
 

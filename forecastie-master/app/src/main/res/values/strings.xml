@@ -2,6 +2,7 @@
     <string name="app_name">Forecastie</string>
 
     <string name="action_search">Search</string>
+    <string name="action_camera">Camera</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_settings">Settings</string>
     <string name="action_about">About</string>
@@ -19,10 +20,13 @@
     <string name="last_update">Last update:\n%s</string>
     <string name="last_update_widget">\nLast update: %s</string>
 
+    <string name="widget_button_refresh">Refresh Button</string>
+    <string name="widget_icon">Widget Icon</string>
+
     <string name="search_title">Search for city</string>
 
-    <string name="downloading_data">Downloading your data ...</string>
-    <string name="getting_location">Getting your location ...</string>
+    <string name="downloading_data">Downloading your data …</string>
+    <string name="getting_location">Getting your location …</string>
 
     <string name="error_dateFormat">DATE FORMAT ERROR</string>
 
@@ -133,4 +137,6 @@
     <string name="rain">Rain</string>
     <string name="temperature">Temperature</string>
     <string name="action_graphs">Graphs</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

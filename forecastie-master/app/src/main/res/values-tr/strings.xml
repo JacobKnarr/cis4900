@@ -21,8 +21,8 @@
 
     <string name="search_title">Şehir ara</string>
 
-    <string name="downloading_data">Verileriniz indiliyor ....</string>
-    <string name="getting_location">Konumunuz alınıyor ...</string>
+    <string name="downloading_data">Verileriniz indiliyor …</string>
+    <string name="getting_location">Konumunuz alınıyor …</string>
 
     <string name="error_dateFormat">TARİH BİÇİMİ HATASI</string>
 
@@ -120,5 +120,7 @@
     <string name="rain">Yağmur</string>
     <string name="temperature">Sıcaklık</string>
     <string name="action_graphs">Grafikler</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>
 

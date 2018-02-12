@@ -33,7 +33,8 @@ public class ExtensiveWidgetProvider extends AbstractWidgetProvider {
             remoteViews.setOnClickPendingIntent(R.id.widgetRoot, pendingIntent2);
 
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-            Weather widgetWeather = new Weather();
+            Weather widgetWeather;
+            new Weather();
             if(!sp.getString("lastToday", "").equals("")) {
                 widgetWeather = parseWidgetJson(sp.getString("lastToday", ""), context);
             }

@@ -2,6 +2,7 @@
 <android.support.design.widget.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -15,5 +16,6 @@
         app:navigationContentDescription="@string/abc_action_bar_up_description"
         android:background="?attr/colorPrimary"
         app:navigationIcon="?attr/homeAsUpIndicator"
-        app:title="@string/action_settings" />
+        app:title="@string/action_settings"
+        tools:ignore="PrivateResource" />
 </android.support.design.widget.AppBarLayout>

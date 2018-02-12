@@ -15,17 +15,16 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 
 import cz.martykan.forecastie.AlarmReceiver;
 import cz.martykan.forecastie.R;
@@ -34,7 +33,7 @@ public class SettingsActivity extends PreferenceActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Thursday 2016-01-14 16:00:00
-    Date SAMPLE_DATE = new Date(1452805200000l);
+    Date SAMPLE_DATE = new Date(1452805200000L);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +44,7 @@ public class SettingsActivity extends PreferenceActivity
         LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent().getParent();
         View bar = LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
         root.addView(bar, 0);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.settings_toolbar);
+        Toolbar toolbar = findViewById(R.id.settings_toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,7 +109,7 @@ public class SettingsActivity extends PreferenceActivity
                 startActivity(getIntent());
                 break;
             case "updateLocationAutomatically":
-                if (sharedPreferences.getBoolean(key, false) == true) {
+                if (sharedPreferences.getBoolean(key, false)) {
                     requestReadLocationPermission();
                 }
                 break;
@@ -124,7 +123,7 @@ public class SettingsActivity extends PreferenceActivity
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Explanation not needed, since user requests this themself
+                // Explanation not needed, since user requests this them self
 
             } else {
                 ActivityCompat.requestPermissions(this,
@@ -137,7 +136,7 @@ public class SettingsActivity extends PreferenceActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == MainActivity.MY_PERMISSIONS_ACCESS_FINE_LOCATION) {
             boolean permissionGranted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
             CheckBoxPreference checkBox = (CheckBoxPreference) findPreference("updateLocationAutomatically");
@@ -153,8 +152,12 @@ public class SettingsActivity extends PreferenceActivity
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         try {
             DummyLocationListener dummyLocationListener = new DummyLocationListener();
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, dummyLocationListener);
-            locationManager.removeUpdates(dummyLocationListener);
+            if (locationManager != null) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, dummyLocationListener);
+            }
+            if (locationManager != null) {
+                locationManager.removeUpdates(dummyLocationListener);
+            }
         } catch (SecurityException e) {
             // This will most probably not happen, as we just got granted the permission
         }

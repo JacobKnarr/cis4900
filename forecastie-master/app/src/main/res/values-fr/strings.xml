@@ -128,4 +128,6 @@
     <string name="rain">Pluie</string>
     <string name="temperature">Température</string>
     <string name="action_graphs">Graphiques</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

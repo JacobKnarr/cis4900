@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private static Map<String, Integer> pressUnits = new HashMap<>(3);
     private static boolean mappingsInitialised = false;
 
+
     Typeface weatherFont;
     Weather todayWeather = new Weather();
 
@@ -106,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Initialize the associated SharedPreferences file with default values
         PreferenceManager.setDefaultValues(this, R.xml.prefs, false);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -122,28 +123,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         progressDialog = new ProgressDialog(MainActivity.this);
 
         // Load toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (darkTheme) {
             toolbar.setPopupTheme(R.style.AppTheme_PopupOverlay_Dark);
         }
 
         // Initialize textboxes
-        todayTemperature = (TextView) findViewById(R.id.todayTemperature);
-        todayDescription = (TextView) findViewById(R.id.todayDescription);
-        todayWind = (TextView) findViewById(R.id.todayWind);
-        todayPressure = (TextView) findViewById(R.id.todayPressure);
-        todayHumidity = (TextView) findViewById(R.id.todayHumidity);
-        todaySunrise = (TextView) findViewById(R.id.todaySunrise);
-        todaySunset = (TextView) findViewById(R.id.todaySunset);
-        lastUpdate = (TextView) findViewById(R.id.lastUpdate);
-        todayIcon = (TextView) findViewById(R.id.todayIcon);
+        todayTemperature = findViewById(R.id.todayTemperature);
+        todayDescription = findViewById(R.id.todayDescription);
+        todayWind = findViewById(R.id.todayWind);
+        todayPressure = findViewById(R.id.todayPressure);
+        todayHumidity = findViewById(R.id.todayHumidity);
+        todaySunrise = findViewById(R.id.todaySunrise);
+        todaySunset = findViewById(R.id.todaySunset);
+        lastUpdate = findViewById(R.id.lastUpdate);
+        todayIcon = findViewById(R.id.todayIcon);
         weatherFont = Typeface.createFromAsset(this.getAssets(), "fonts/weather.ttf");
         todayIcon.setTypeface(weatherFont);
 
         // Initialize viewPager
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabs);
 
         destroyed = false;
 
@@ -219,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         new LongTermWeatherTask(this, this, progressDialog).execute();
     }
 
+    @SuppressLint("RestrictedApi")
     private void searchCities() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle(this.getString(R.string.search_title));
@@ -249,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("city", result);
-        editor.commit();
+        editor.apply();
 
         if (!recentCity.equals(result)) {
             // New location, update weather
@@ -258,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private void aboutDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Forecastie");
@@ -357,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             JSONObject coordinates = reader.getJSONObject("coord");
             if (coordinates != null) {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-                sp.edit().putFloat("latitude", (float) coordinates.getDouble("lon")).putFloat("longitude", (float) coordinates.getDouble("lat")).commit();
+                sp.edit().putFloat("latitude", (float) coordinates.getDouble("lon")).putFloat("longitude", (float) coordinates.getDouble("lat")).apply();
             }
 
             JSONObject main = reader.getJSONObject("main");
@@ -395,7 +398,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit();
             editor.putString("lastToday", result);
-            editor.commit();
+            editor.apply();
 
         } catch (JSONException e) {
             Log.e("JSONException Data", result);
@@ -504,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 weather.setHumidity(main.getString("humidity"));
 
                 JSONObject rainObj = listItem.optJSONObject("rain");
-                String rain = "";
+                String rain;
                 if (rainObj != null) {
                     rain = getRainString(rainObj);
                 } else {
@@ -536,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit();
             editor.putString("lastLongterm", result);
-            editor.commit();
+            editor.apply();
         } catch (JSONException e) {
             Log.e("JSONException Data", result);
             e.printStackTrace();
@@ -585,7 +588,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo activeNetworkInfo = null;
+        if (connectivityManager != null) {
+            activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        }
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
@@ -606,6 +612,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.action_camera) {
+            /*NEED TO LAUNCH CAMERA OR CAMERA ACTIVITY*/
+        }
         if (id == R.id.action_refresh) {
             if (isNetworkAvailable()) {
                 getTodayWeather();
@@ -698,7 +707,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Explanation not needed, since user requests this themmself
+                // Explanation not needed, since user requests this them self
 
             } else {
                 ActivityCompat.requestPermissions(this,
@@ -752,14 +761,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     getCityByLocation();
                 }
-                return;
             }
         }
     }
@@ -793,9 +801,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-
+    /*FIND OUT WHY THESE SHOULD BE STATIC*/
     class TodayWeatherTask extends GenericRequestTask {
-        public TodayWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
+        TodayWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
             super(context, activity, progressDialog);
         }
 
@@ -830,8 +838,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    class LongTermWeatherTask extends GenericRequestTask {
-        public LongTermWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
+     class LongTermWeatherTask extends GenericRequestTask {
+        LongTermWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
             super(context, activity, progressDialog);
         }
 
@@ -853,7 +861,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     class ProvideCityNameTask extends GenericRequestTask {
 
-        public ProvideCityNameTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
+        ProvideCityNameTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
             super(context, activity, progressDialog);
         }
 
@@ -867,7 +875,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         @Override
         protected ParseResult parseResponse(String response) {
-            Log.i("RESULT", response.toString());
+            Log.i("RESULT", response);
             try {
                 JSONObject reader = new JSONObject(response);
 
@@ -901,7 +909,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             handleTaskOutput(output);
         }
     }
-
+    /*WHERE SHOULD RETURN BE USED OR MAKE VOID*/
     public static long saveLastUpdateTime(SharedPreferences sp) {
         Calendar now = Calendar.getInstance();
         sp.edit().putLong("lastUpdate", now.getTimeInMillis()).apply();

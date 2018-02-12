@@ -1,5 +1,6 @@
 package cz.martykan.forecastie.activities;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -16,6 +17,7 @@ public class MapActivity extends AppCompatActivity {
 
     private BottomBar mBottomBar;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -25,7 +27,7 @@ public class MapActivity extends AppCompatActivity {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String apiKey = sp.getString("apiKey", getResources().getString(R.string.apiKey));
 
-        final WebView webView = (WebView) findViewById(R.id.webView);
+        final WebView webView = findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl("file:///android_asset/map.html?lat=" + prefs.getFloat("latitude", 0) + "&lon=" + prefs.getFloat("longitude", 0) + "&appid=" + apiKey);
 

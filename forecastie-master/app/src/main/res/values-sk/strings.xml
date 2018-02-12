@@ -27,8 +27,8 @@
     <string name="setting_differentiateDaysByTint"> Oddeliť dni farbou</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Storno</string>
-    <string name="downloading_data">Sťahovanie dát...</string>
-    <string name="getting_location">Získavanie Vašej polohy...</string>
+    <string name="downloading_data">Sťahovanie dát…</string>
+    <string name="getting_location">Získavanie Vašej polohy…</string>
     <string name="setting_apiKey">API kľúč</string>
     <string name="setting_apiKey_summary">Vlastné API kľúč pre OpenWeatherMap</string>
     <string name="msg_city_not_found">Mesto nebolo nájdené.</string>
@@ -80,4 +80,6 @@
     <string name="dash_clock_expanded_title">%1$s%2$s - %3$s</string>
     <!-- 1: city; 2: country; 3: wind; 4: speed units; 5: pressure; 6: pressure units; 7: humidity -->
     <string name="dash_clock_expanded_body">%1$s, %2$s\nVietor: %3$s %4$s\nTlak: %5$s %6$s\nVlhkosť: %7$s %%\n</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

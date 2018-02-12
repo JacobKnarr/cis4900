@@ -21,8 +21,8 @@
 
     <string name="search_title">Buscar una ciudad</string>
 
-    <string name="downloading_data">Descargando sus datos...</string>
-    <string name="getting_location">Obteniendo su ubicación...</string>
+    <string name="downloading_data">Descargando sus datos…</string>
+    <string name="getting_location">Obteniendo su ubicación…</string>
 
     <string name="error_dateFormat">ERROR EN FORMATO DE FECHA</string>
 
@@ -120,4 +120,6 @@
     <string name="rain">Lluvia</string>
     <string name="temperature">Temperatura</string>
     <string name="action_graphs">Gráficas</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

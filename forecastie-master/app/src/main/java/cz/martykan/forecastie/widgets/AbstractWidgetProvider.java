@@ -85,7 +85,7 @@ public abstract class AbstractWidgetProvider extends AppWidgetProvider {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 
             // Temperature
-            float temperature = UnitConvertor.convertTemperature(Float.parseFloat(reader.optJSONObject("main").getString("temp").toString()), sp);
+            float temperature = UnitConvertor.convertTemperature(Float.parseFloat(reader.optJSONObject("main").getString("temp")), sp);
             if (sp.getBoolean("temperatureInteger", false)) {
                 temperature = Math.round(temperature);
             }
@@ -93,7 +93,7 @@ public abstract class AbstractWidgetProvider extends AppWidgetProvider {
             // Wind
             double wind;
             try {
-                wind = Double.parseDouble(reader.optJSONObject("wind").getString("speed").toString());
+                wind = Double.parseDouble(reader.optJSONObject("wind").getString("speed"));
             } catch (Exception e) {
                 e.printStackTrace();
                 wind = 0;
@@ -101,7 +101,7 @@ public abstract class AbstractWidgetProvider extends AppWidgetProvider {
             wind = UnitConvertor.convertWind(wind, sp);
 
             // Pressure
-            double pressure = UnitConvertor.convertPressure((float) Double.parseDouble(reader.optJSONObject("main").getString("pressure").toString()), sp);
+            double pressure = UnitConvertor.convertPressure((float) Double.parseDouble(reader.optJSONObject("main").getString("pressure")), sp);
 
             long lastUpdateTimeInMillis = sp.getLong("lastUpdate", -1);
             String lastUpdate;

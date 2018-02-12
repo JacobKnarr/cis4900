@@ -21,8 +21,8 @@
 
     <string name="search_title">都市の検索</string>
 
-    <string name="downloading_data">データのダウンロード中 ...</string>
-    <string name="getting_location">位置の取得中 ...</string>
+    <string name="downloading_data">データのダウンロード中 …</string>
+    <string name="getting_location">位置の取得中 …</string>
 
     <string name="error_dateFormat">日付形式エラー</string>
 
@@ -116,4 +116,5 @@
     <string name="location_settings_button">設定</string>
     <string name="action_weather_map">天気地図</string>
 
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

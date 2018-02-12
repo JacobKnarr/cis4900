@@ -21,8 +21,8 @@
 
     <string name="search_title">Hiri bat bilatu</string>
 
-    <string name="downloading_data">Zure datuak deskargatzen ...</string>
-    <string name="getting_location">Zure kokapena eskuratzen ...</string>
+    <string name="downloading_data">Zure datuak deskargatzen …</string>
+    <string name="getting_location">Zure kokapena eskuratzen …</string>
     
     <string name="error_dateFormat">AKATSA DATAREN FORMATUAN</string>
     
@@ -120,4 +120,6 @@
     <string name="rain">Euria</string>
     <string name="temperature">Tenperatura</string>
     <string name="action_graphs">Grafikoak</string>
+
+    <string name="filter_title_viewforecastie">Forecastie</string>
 </resources>

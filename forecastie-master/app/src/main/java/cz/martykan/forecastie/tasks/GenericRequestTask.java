@@ -1,6 +1,5 @@
 package cz.martykan.forecastie.tasks;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.ProgressBar;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -28,10 +26,10 @@ import cz.martykan.forecastie.activities.MainActivity;
 
 public abstract class GenericRequestTask extends AsyncTask<String, String, TaskOutput> {
 
-    ProgressDialog progressDialog;
-    Context context;
-    MainActivity activity;
-    public int loading = 0;
+    private ProgressDialog progressDialog;
+    private Context context;
+    private MainActivity activity;
+    protected int loading = 0;
 
     public GenericRequestTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
         this.context = context;
@@ -53,13 +51,13 @@ public abstract class GenericRequestTask extends AsyncTask<String, String, TaskO
     protected TaskOutput doInBackground(String... params) {
         TaskOutput output = new TaskOutput();
 
-        String response = "";
+        StringBuilder response = new StringBuilder();
         String[] coords = new String[]{};
 
         if (params != null && params.length > 0) {
             final String zeroParam = params[0];
             if ("cachedResponse".equals(zeroParam)) {
-                response = params[1];
+                response = new StringBuilder(params[1]);
                 // Actually we did nothing in this case :)
                 output.taskResult = TaskResult.SUCCESS;
             } else if ("coords".equals(zeroParam)) {
@@ -69,7 +67,7 @@ public abstract class GenericRequestTask extends AsyncTask<String, String, TaskO
             }
         }
 
-        if (response.isEmpty()) {
+        if (response.length() == 0) {
             try {
                 URL url = provideURL(coords);
                 Log.i("URL", url.toString());
@@ -78,10 +76,11 @@ public abstract class GenericRequestTask extends AsyncTask<String, String, TaskO
                     InputStreamReader inputStreamReader = new InputStreamReader(urlConnection.getInputStream());
                     BufferedReader r = new BufferedReader(inputStreamReader);
 
+                    /*SEE WHERE THIS SHOULD BE USED OR REMOVE IT*/
                     int responseCode = urlConnection.getResponseCode();
-                    String line = null;
+                    String line;
                     while ((line = r.readLine()) != null) {
-                        response += line + "\n";
+                        response.append(line).append("\n");
                     }
                     close(r);
                     urlConnection.disconnect();
@@ -89,7 +88,7 @@ public abstract class GenericRequestTask extends AsyncTask<String, String, TaskO
                     Log.i("Task", "done successfully");
                     output.taskResult = TaskResult.SUCCESS;
                     // Save date/time for latest successful result
-                    activity.saveLastUpdateTime(PreferenceManager.getDefaultSharedPreferences(context));
+                    MainActivity.saveLastUpdateTime(PreferenceManager.getDefaultSharedPreferences(context));
                 }
                 else if (urlConnection.getResponseCode() == 429) {
                     // Too many requests
@@ -102,7 +101,7 @@ public abstract class GenericRequestTask extends AsyncTask<String, String, TaskO
                     output.taskResult = TaskResult.BAD_RESPONSE;
                 }
             } catch (IOException e) {
-                Log.e("IOException Data", response);
+                Log.e("IOException Data", response.toString());
                 e.printStackTrace();
                 // Exception while reading data from url connection
                 output.taskResult = TaskResult.IO_EXCEPTION;
@@ -111,7 +110,7 @@ public abstract class GenericRequestTask extends AsyncTask<String, String, TaskO
 
         if (TaskResult.SUCCESS.equals(output.taskResult)) {
             // Parse JSON data
-            ParseResult parseResult = parseResponse(response);
+            ParseResult parseResult = parseResponse(response.toString());
             if (ParseResult.CITY_NOT_FOUND.equals(parseResult)) {
                 // Retain previously specified city if current one was not recognized
                 restorePreviousCity();
@@ -191,7 +190,7 @@ public abstract class GenericRequestTask extends AsyncTask<String, String, TaskO
         if (!TextUtils.isEmpty(activity.recentCity)) {
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
             editor.putString("city", activity.recentCity);
-            editor.commit();
+            editor.apply();
             activity.recentCity = "";
         }
     }

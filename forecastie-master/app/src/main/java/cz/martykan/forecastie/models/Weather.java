@@ -45,7 +45,7 @@ public class Weather {
     }
 
     // you may use values like 4, 8, etc. for numberOfDirections
-    public static int windDirectionDegreeToIndex(double degree, int numberOfDirections) {
+    static int windDirectionDegreeToIndex(double degree, int numberOfDirections) {
         // to be on the safe side
         degree %= 360;
         if(degree < 0) degree += 360;
@@ -115,6 +115,7 @@ public class Weather {
         this.wind = wind;
     }
 
+    /*SEE WHERE THIS MAY BE USED OR DELETE*/
     public Double getWindDirectionDegree() {
         return windDirectionDegree;
     }
