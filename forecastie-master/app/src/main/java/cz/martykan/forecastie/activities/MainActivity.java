@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setMaxLines(1);
         input.setSingleLine(true);
-        alert.setView(input, 32, 0, 32, 0);
+        alert.setView(input);
         alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String result = input.getText().toString();
@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 about;
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.loadData(about, "text/html", "UTF-8");
-        alert.setView(webView, 32, 0, 32, 0);
+        alert.setView(webView);
         alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -409,6 +409,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return ParseResult.OK;
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateTodayWeatherUI() {
         try {
             if (todayWeather.getCountry().isEmpty()) {
@@ -422,8 +423,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         String city = todayWeather.getCity();
         String country = todayWeather.getCountry();
         DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(getApplicationContext());
-        getSupportActionBar().setTitle(city + (country.isEmpty() ? "" : ", " + country));
-
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(city + (country.isEmpty() ? "" : ", " + country));
+        }
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 
         // Temperature
@@ -612,9 +614,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        /*add in code to launch camera
         if (id == R.id.action_camera) {
-            /*NEED TO LAUNCH CAMERA OR CAMERA ACTIVITY*/
-        }
+            NEED TO LAUNCH CAMERA OR CAMERA ACTIVITY
+        }*/
         if (id == R.id.action_refresh) {
             if (isNetworkAvailable()) {
                 getTodayWeather();
@@ -705,11 +708,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 // Explanation not needed, since user requests this them self
-
-            } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_ACCESS_FINE_LOCATION);
@@ -802,6 +803,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     /*FIND OUT WHY THESE SHOULD BE STATIC*/
+    @SuppressLint("StaticFieldLeak")
     class TodayWeatherTask extends GenericRequestTask {
         TodayWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
             super(context, activity, progressDialog);
@@ -838,6 +840,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+     @SuppressLint("StaticFieldLeak")
      class LongTermWeatherTask extends GenericRequestTask {
         LongTermWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
             super(context, activity, progressDialog);
@@ -859,6 +862,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     class ProvideCityNameTask extends GenericRequestTask {
 
         ProvideCityNameTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
@@ -910,10 +914,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
     /*WHERE SHOULD RETURN BE USED OR MAKE VOID*/
-    public static long saveLastUpdateTime(SharedPreferences sp) {
+    public static void saveLastUpdateTime(SharedPreferences sp) {
         Calendar now = Calendar.getInstance();
         sp.edit().putLong("lastUpdate", now.getTimeInMillis()).apply();
-        return now.getTimeInMillis();
+        now.getTimeInMillis();
     }
 
     private void updateLastUpdateTime() {

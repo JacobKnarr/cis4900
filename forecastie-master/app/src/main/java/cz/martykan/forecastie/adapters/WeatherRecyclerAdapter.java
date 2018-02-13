@@ -1,5 +1,6 @@
 package cz.martykan.forecastie.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
@@ -14,6 +15,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import cz.martykan.forecastie.R;
@@ -33,11 +35,13 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherViewHold
 
     @Override
     public WeatherViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, null);
+        final ViewGroup nullParent = null;
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, nullParent);
 
         return new WeatherViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(WeatherViewHolder customViewHolder, int i) {
         Weather weatherItem = itemList.get(i);
@@ -75,7 +79,7 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherViewHold
         }
         String dateString;
         try {
-            SimpleDateFormat resultFormat = new SimpleDateFormat(dateFormat);
+            SimpleDateFormat resultFormat = new SimpleDateFormat(dateFormat, Locale.getDefault());
             resultFormat.setTimeZone(tz);
             dateString = resultFormat.format(weatherItem.getDate());
         } catch (IllegalArgumentException e) {

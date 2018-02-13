@@ -43,7 +43,7 @@
                         android:id="@+id/todayTemperature"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 °C"
+                        android:text="@string/today_temperature"
                         android:textColor="@color/text_light"
                         android:textSize="36sp" />
 
@@ -51,7 +51,7 @@
                         android:id="@+id/todayDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No data"
+                        android:text="@string/today_desciption"
                         android:textColor="@color/text_light"
                         android:textSize="16sp" />
 
@@ -60,7 +60,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Wind: 0 m/s"
+                        android:text="@string/today_wind"
                         android:textColor="@color/text_light"
                         android:textSize="16sp" />
 
@@ -68,7 +68,7 @@
                         android:id="@+id/todayPressure"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pressure: 0 hpa"
+                        android:text="@string/today_pressure"
                         android:textColor="@color/text_light"
                         android:textSize="16sp" />
 
@@ -76,7 +76,7 @@
                         android:id="@+id/todayHumidity"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Humidity: 0 %"
+                        android:text="@string/today_humidity"
                         android:textColor="@color/text_light"
                         android:textSize="16sp" />
 
@@ -84,7 +84,7 @@
                         android:id="@+id/todaySunrise"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sunrise: 00:00"
+                        android:text="@string/today_sunrise"
                         android:textColor="@color/text_light"
                         android:textSize="16sp" />
 
@@ -92,7 +92,7 @@
                         android:id="@+id/todaySunset"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sunset: 00:00"
+                        android:text="@string/today_sunset"
                         android:textColor="@color/text_light"
                         android:textSize="16sp" />
                 </LinearLayout>

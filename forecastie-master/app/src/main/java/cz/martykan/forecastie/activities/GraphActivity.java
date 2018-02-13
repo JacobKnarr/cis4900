@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import cz.martykan.forecastie.R;
@@ -58,7 +59,9 @@ public class GraphActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.graph_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         if (darkTheme) {
             toolbar.setPopupTheme(R.style.AppTheme_PopupOverlay_Dark);
         }
@@ -247,7 +250,7 @@ public class GraphActivity extends AppCompatActivity {
 
     public String getDateLabel(Weather weather, int i) {
         if ((i + 4) % 4 == 0) {
-            SimpleDateFormat resultFormat = new SimpleDateFormat("E");
+            SimpleDateFormat resultFormat = new SimpleDateFormat("E", Locale.getDefault());
             resultFormat.setTimeZone(TimeZone.getDefault());
             String output = resultFormat.format(weather.getDate());
             if (!output.equals(previous)) {
