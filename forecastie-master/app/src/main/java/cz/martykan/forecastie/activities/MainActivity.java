@@ -244,6 +244,55 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 // Cancelled
             }
         });
+
+        /*Creates a favourites dialog so the user can choose from favourites they have saved*/
+        alert.setNeutralButton(R.string.dialog_favourites, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPreferences preferences2 = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                SharedPreferences.Editor editor = preferences2.edit();
+                editor.apply();
+                AlertDialog.Builder alert2 = new AlertDialog.Builder(MainActivity.this);
+                alert2.setTitle(MainActivity.this.getString(R.string.favourites_title));
+
+                /*make this run through all 5 favourites, and restrict addition to 5*/
+                final String favList = preferences2.getString("favourite1", "No Favourites!");
+                final String[] stringList = {favList};   // here is list
+                final String[] choice = {stringList[0]};
+
+                alert2.setSingleChoiceItems(stringList, 0, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(),
+                                "Favourite Chosen = "+ stringList[which], Toast.LENGTH_SHORT).show();
+                        choice[0] = stringList[which];
+                    }
+                });
+                alert2.setNeutralButton(R.string.remove_favourite, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(),
+                                "Favourite Removed = "+ choice[0], Toast.LENGTH_LONG).show();
+                    }
+                });
+                alert2.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if (!choice[0].isEmpty() && !choice[0].equals("No Favourites!")) {
+                            saveLocation(choice[0]);
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Click the star to add the current location as a favourite", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                alert2.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Cancelled
+                    }
+                });
+                alert2.show();
+            }
+        });
         alert.show();
     }
 
@@ -260,49 +309,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             getTodayWeather();
             getLongTermWeather();
         }
-    }
-
-    @SuppressLint("RestrictedApi")
-    private void favouritesDialog() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.apply();
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle(this.getString(R.string.favourites_title));
-
-        /*make this run through all 5 favourites, and restrict addition to 5*/
-        final String favList = preferences.getString("favourite1", "Click the Favourites button to add a Favourite");
-        final String[] stringList = {favList};// here is list
-        final String[] choice = {stringList[0]};
-
-        alert.setSingleChoiceItems(stringList, 0, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getApplicationContext(),
-                        "Favourite Chosen = "+ stringList[which], Toast.LENGTH_SHORT).show();
-                choice[0] = stringList[which];
-            }
-        });
-        alert.setNeutralButton(R.string.remove_favourite, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getApplicationContext(),
-                        "Favourite Removed = "+ choice[0], Toast.LENGTH_LONG).show();
-            }
-        });
-        alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if (!choice[0].isEmpty()) {
-                    saveLocation(choice[0]);
-                }
-            }
-        });
-        alert.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Cancelled
-            }
-        });
-        alert.show();
     }
 
     @SuppressLint("RestrictedApi")
@@ -659,10 +665,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /*add in code to launch camera*/
+        /*add in code to launch camera
         if (id == R.id.action_camera) {
-            favouritesDialog();
-        }
+
+        }*/
         if (id == R.id.action_refresh) {
             if (isNetworkAvailable()) {
                 getTodayWeather();
