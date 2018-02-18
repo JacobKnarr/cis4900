@@ -36,7 +36,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -228,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setMaxLines(1);
         input.setSingleLine(true);
-        alert.setView(input);
+        alert.setView(input,32,0,32,0);
         alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String result = input.getText().toString();
@@ -261,6 +263,49 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     @SuppressLint("RestrictedApi")
+    private void favouritesDialog() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.apply();
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(this.getString(R.string.favourites_title));
+
+        /*make this run through all 5 favourites, and restrict addition to 5*/
+        final String favList = preferences.getString("favourite1", "Click the Favourites button to add a Favourite");
+        final String[] stringList = {favList};// here is list
+        final String[] choice = {stringList[0]};
+
+        alert.setSingleChoiceItems(stringList, 0, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),
+                        "Favourite Chosen = "+ stringList[which], Toast.LENGTH_SHORT).show();
+                choice[0] = stringList[which];
+            }
+        });
+        alert.setNeutralButton(R.string.remove_favourite, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),
+                        "Favourite Removed = "+ choice[0], Toast.LENGTH_LONG).show();
+            }
+        });
+        alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (!choice[0].isEmpty()) {
+                    saveLocation(choice[0]);
+                }
+            }
+        });
+        alert.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Cancelled
+            }
+        });
+        alert.show();
+    }
+
+    @SuppressLint("RestrictedApi")
     private void aboutDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Forecastie");
@@ -283,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 about;
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.loadData(about, "text/html", "UTF-8");
-        alert.setView(webView);
+        alert.setView(webView,32,0,32,0);
         alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -614,10 +659,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /*add in code to launch camera
+        /*add in code to launch camera*/
         if (id == R.id.action_camera) {
-            NEED TO LAUNCH CAMERA OR CAMERA ACTIVITY
-        }*/
+            favouritesDialog();
+        }
         if (id == R.id.action_refresh) {
             if (isNetworkAvailable()) {
                 getTodayWeather();

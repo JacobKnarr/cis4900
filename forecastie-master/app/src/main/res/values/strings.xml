@@ -153,4 +153,7 @@
     <string name="item_humidity">Humidity: 0 %</string>
     <string name="item_icon">o</string>
     <string name="item_temperature">0 °C</string>
+    <string name="favourites_title">Favourites</string>
+    <string name="remove_favourite">Remove Favourite</string>
+    <string name="favourites_list">London</string>
 </resources>
