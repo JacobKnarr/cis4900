@@ -256,8 +256,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 alert2.setTitle(MainActivity.this.getString(R.string.favourites_title));
 
                 /*make this run through all 5 favourites, and restrict addition to 5*/
-                final String favList = preferences2.getString("favourite1", "No Favourites!");
-                final String[] stringList = {favList};   // here is list
+                final String favList = preferences2.getString("favourite", "No Favourites!");
+                final String[] stringList = favList.split(","); // here is list
                 final String[] choice = {stringList[0]};
 
                 alert2.setSingleChoiceItems(stringList, 0, new DialogInterface.OnClickListener() {
@@ -309,6 +309,45 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             getTodayWeather();
             getLongTermWeather();
         }
+    }
+
+
+    private void saveFavourite() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        SharedPreferences.Editor editor = preferences.edit();
+        Boolean same = false;
+        String favList = preferences.getString("favourite", "No Favourites!");
+
+        if (favList.equals("No Favourites!")) {
+            favList = "";
+        }
+        final String[] stringList = favList.split(",");
+        recentCity = preferences.getString("city", Constants.DEFAULT_CITY);
+        if (stringList.length == 5)
+        {
+            Toast.makeText(getApplicationContext(),
+                    "You can only have 5 favourites!", Toast.LENGTH_LONG).show();
+            return;
+        }
+        for (String aStringList : stringList) {
+            if (recentCity.equals(aStringList)) {
+                same = true;
+            }
+        }
+        if (same) {
+            Toast.makeText(getApplicationContext(),
+                    "This location is already a favourite!", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (favList.equals("")) {
+            favList = recentCity;
+        } else {
+            favList += "," + recentCity;
+        }
+        editor.putString("favourite", favList);
+        editor.apply();
+        Toast.makeText(getApplicationContext(),
+                "Favourite Added = "+ recentCity, Toast.LENGTH_SHORT).show();
     }
 
     @SuppressLint("RestrictedApi")
@@ -665,10 +704,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /*add in code to launch camera
+        /*add in code to launch camera*/
         if (id == R.id.action_camera) {
-
-        }*/
+            saveFavourite();
+        }
         if (id == R.id.action_refresh) {
             if (isNetworkAvailable()) {
                 getTodayWeather();
