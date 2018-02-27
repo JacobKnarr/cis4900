@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import cz.martykan.forecastie.AlarmReceiver;
 import cz.martykan.forecastie.R;
@@ -121,11 +122,9 @@ public class SettingsActivity extends PreferenceActivity
     private void requestReadLocationPermission() {
         System.out.println("Calling request location permission");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 // Explanation not needed, since user requests this them self
-
-            } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MainActivity.MY_PERMISSIONS_ACCESS_FINE_LOCATION);
@@ -185,7 +184,8 @@ public class SettingsActivity extends PreferenceActivity
         EditTextPreference customDateFormatPref = (EditTextPreference) findPreference("dateFormatCustom");
         customDateFormatPref.setDefaultValue(dateFormatsValues[0]);
 
-        SimpleDateFormat sdformat = new SimpleDateFormat();
+        /*added date format type and default local*/
+        SimpleDateFormat sdformat = new SimpleDateFormat("E", Locale.getDefault());
         for (int i=0; i<dateFormatsValues.length; i++) {
             String value = dateFormatsValues[i];
             if ("custom".equals(value)) {

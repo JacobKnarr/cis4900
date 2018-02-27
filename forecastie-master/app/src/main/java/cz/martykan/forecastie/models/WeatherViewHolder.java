@@ -14,7 +14,7 @@ public class WeatherViewHolder extends RecyclerView.ViewHolder {
     public TextView itemPressure;
     public TextView itemHumidity;
     public TextView itemIcon;
-    public View lineView;
+
 
     public WeatherViewHolder(View view) {
         super(view);
@@ -25,6 +25,6 @@ public class WeatherViewHolder extends RecyclerView.ViewHolder {
         this.itemPressure = view.findViewById(R.id.itemPressure);
         this.itemHumidity = view.findViewById(R.id.itemHumidity);
         this.itemIcon = view.findViewById(R.id.itemIcon);
-        this.lineView = view.findViewById(R.id.lineView);
+        view.findViewById(R.id.lineView);
     }
 }

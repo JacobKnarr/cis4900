@@ -50,7 +50,8 @@
         android:textSize="24sp"
         android:textStyle="bold"
         tools:text="0 °C"
-        android:textColor="@color/text_light"/>
+        android:textColor="@color/text_light"
+        tools:ignore="RelativeOverlap" />
 
     <TextView
         android:id="@+id/widgetDescription"
@@ -60,7 +61,8 @@
         android:layout_alignParentBottom="true"
         android:textSize="16sp"
         tools:text="Clear Sky"
-        android:textColor="@color/text_light" />
+        android:textColor="@color/text_light"
+        tools:ignore="RelativeOverlap" />
 
     <TextView
         android:id="@+id/widgetLastUpdate"

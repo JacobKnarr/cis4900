@@ -15,6 +15,7 @@ import android.widget.RemoteViews;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import cz.martykan.forecastie.AlarmReceiver;
@@ -70,10 +71,8 @@ public class TimeWidgetProvider extends AbstractWidgetProvider {
             dateFormat = dateFormat.substring(0, dateFormat.indexOf("-")-1);
             String dateString;
             try {
-                /*NEED TO SEE WHY THERE IS A SWTICH STATEMENT HERE"*/
-                SimpleDateFormat resultFormat = new SimpleDateFormat(dateFormat);
-                switch (dateString = resultFormat.format(new Date())) {
-                }
+                SimpleDateFormat resultFormat = new SimpleDateFormat(dateFormat, Locale.getDefault());
+                dateString = resultFormat.format(new Date());
             } catch (IllegalArgumentException e) {
                 dateString = context.getResources().getString(R.string.error_dateFormat);
             }

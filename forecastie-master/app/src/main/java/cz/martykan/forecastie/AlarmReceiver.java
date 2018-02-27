@@ -1,5 +1,6 @@
 package cz.martykan.forecastie;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -81,7 +82,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo activeNetworkInfo = null;
+        if (connectivityManager != null) {
+            activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        }
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
@@ -90,6 +94,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         return preferences.getBoolean("updateLocationAutomatically", false);
     }
 
+    @SuppressLint("StaticFieldLeak")
     public class GetWeatherTask extends AsyncTask<String, String, Void> {
 
         protected void onPreExecute() {
@@ -98,7 +103,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         @Override
         protected Void doInBackground(String... params) {
-            String result = "";
+            StringBuilder result = new StringBuilder();
             try {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
                 String language = Locale.getDefault().getLanguage();
@@ -109,17 +114,14 @@ public class AlarmReceiver extends BroadcastReceiver {
                 BufferedReader r = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 
                 if(urlConnection.getResponseCode() == 200) {
-                    String line = null;
+                    String line;
                     while ((line = r.readLine()) != null) {
-                        result += line + "\n";
+                        result.append(line).append("\n");
                     }
                     SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("lastToday", result);
+                    editor.putString("lastToday", result.toString());
                     editor.apply();
                     MainActivity.saveLastUpdateTime(sp);
-                }
-                else {
-                    // Connection problem
                 }
             } catch (IOException e) {
                 // No connection
@@ -134,6 +136,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     class GetLongTermWeatherTask extends AsyncTask<String, String, Void> {
 
         protected void onPreExecute() {
@@ -142,7 +145,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         @Override
         protected Void doInBackground(String... params) {
-            String result = "";
+            StringBuilder result = new StringBuilder();
             try {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
                 String language = Locale.getDefault().getLanguage();
@@ -153,16 +156,13 @@ public class AlarmReceiver extends BroadcastReceiver {
                 BufferedReader r = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 
                 if(urlConnection.getResponseCode() == 200) {
-                    String line = null;
+                    String line;
                     while ((line = r.readLine()) != null) {
-                        result += line + "\n";
+                        result.append(line).append("\n");
                     }
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-                    editor.putString("lastLongterm", result);
+                    editor.putString("lastLongterm", result.toString());
                     editor.apply();
-                }
-                else {
-                    // Connection problem
                 }
             } catch (IOException e) {
                 // No connection
@@ -175,6 +175,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     public class GetLocationAndWeatherTask extends AsyncTask <String, String, Void> {
         private static final String TAG = "LocationAndWTask";
 
@@ -238,7 +239,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
 
         public class BackgroundLocationListener implements LocationListener {
-            private static final String TAG = "LocationListener";
             private Location location;
 
             @Override
@@ -261,12 +261,13 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             }
 
-            public Location getLocation() {
+            Location getLocation() {
                 return location;
             }
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     public class GetCityNameTask extends AsyncTask <String, String, Void> {
         private static final String TAG = "GetCityNameTask";
 
@@ -290,14 +291,14 @@ public class AlarmReceiver extends BroadcastReceiver {
 
                 if (urlConnection.getResponseCode() == 200) {
                     BufferedReader r = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                    String result = "";
+                    StringBuilder result = new StringBuilder();
                     String line;
                     while ((line = r.readLine()) != null) {
-                        result += line + "\n";
+                        result.append(line).append("\n");
                     }
                     Log.d(TAG, "JSON Result: " + result);
                     try {
-                        JSONObject reader = new JSONObject(result);
+                        JSONObject reader = new JSONObject(result.toString());
                         String city = reader.getString("name");
                         String country = "";
                         JSONObject countryObj = reader.optJSONObject("sys");
@@ -310,7 +311,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                         SharedPreferences.Editor editor = sp.edit();
                         editor.putString("city", currentCity);
                         editor.putBoolean("cityChanged", !currentCity.equals(lastCity));
-                        editor.commit();
+                        editor.apply();
 
                     } catch (JSONException e){
                         Log.e(TAG, "An error occurred while reading the JSON object", e);
@@ -362,12 +363,16 @@ public class AlarmReceiver extends BroadcastReceiver {
         long intervalMillis = intervalMillisForRecurringAlarm(intervalPref);
         if (intervalMillis == 0) {
             // Cancel previous alarm
-            alarms.cancel(recurringRefresh);
+            if (alarms != null) {
+                alarms.cancel(recurringRefresh);
+            }
         } else {
-            alarms.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + intervalMillis,
-                    intervalMillis,
-                    recurringRefresh);
+            if (alarms != null) {
+                alarms.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + intervalMillis,
+                        intervalMillis,
+                        recurringRefresh);
+            }
         }
     }
 }
