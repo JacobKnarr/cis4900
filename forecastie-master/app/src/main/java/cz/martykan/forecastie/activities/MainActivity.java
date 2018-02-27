@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(getApplicationContext(),
-                                "Favourite Chosen = "+ stringList[which], Toast.LENGTH_SHORT).show();
+                                "Favourite Chosen = " + stringList[which], Toast.LENGTH_SHORT).show();
                         choice[0] = stringList[which];
                     }
                 });
@@ -270,9 +270,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(getApplicationContext(),
-                                "Favourite Removed = "+ choice[0], Toast.LENGTH_LONG).show();
+                                "Favourite Removed = " + choice[0], Toast.LENGTH_LONG).show();
+                        favList[0] = "";
                         for (String favs : stringList) {
-                            favList[0] = "";
                             if (!favs.equals("") && !favs.equals(choice[0])) {
                                 if (favList[0].equals("")) {
                                     favList[0] = favs;
