@@ -156,4 +156,5 @@
     <string name="favourites_title">Favourites</string>
     <string name="remove_favourite">Remove Favourite</string>
     <string name="favourites_list">London</string>
+    <string name="dialog_favourites">Favourites</string>
 </resources>
