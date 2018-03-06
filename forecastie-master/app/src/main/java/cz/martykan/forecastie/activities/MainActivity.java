@@ -37,6 +37,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -228,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setMaxLines(1);
         input.setSingleLine(true);
-        alert.setView(input, 32, 0, 32, 0);
+        alert.setView(input,32,0,32,0);
         alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String result = input.getText().toString();
@@ -240,6 +241,69 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         alert.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Cancelled
+            }
+        });
+
+        /*Creates a favourites dialog so the user can choose from favourites they have saved*/
+        alert.setNeutralButton(R.string.dialog_favourites, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPreferences preferences2 = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                final SharedPreferences.Editor editor = preferences2.edit();
+                AlertDialog.Builder alert2 = new AlertDialog.Builder(MainActivity.this);
+                alert2.setTitle(MainActivity.this.getString(R.string.favourites_title));
+
+                /*make this run through all 5 favourites, and restrict addition to 5*/
+                final String[] favList = {preferences2.getString("favourite", "No Favourites!")};
+                final String[] stringList = favList[0].split(","); // here is list
+                final String[] choice = {stringList[0]};
+
+                alert2.setSingleChoiceItems(stringList, 0, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(),
+                                "Favourite Chosen = " + stringList[which], Toast.LENGTH_SHORT).show();
+                        choice[0] = stringList[which];
+                    }
+                });
+                alert2.setNeutralButton(R.string.remove_favourite, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(),
+                                "Favourite Removed = " + choice[0], Toast.LENGTH_LONG).show();
+                        favList[0] = "";
+                        for (String favs : stringList) {
+                            if (!favs.equals("") && !favs.equals(choice[0])) {
+                                if (favList[0].equals("")) {
+                                    favList[0] = favs;
+                                } else {
+                                    favList[0] += "," + favs;
+                                }
+                            }
+                        }
+                        if (favList[0].equals("")) {
+                            favList[0] = "No Favourites!";
+                        }
+                        editor.putString("favourite", favList[0]);
+                        editor.apply();
+                    }
+                });
+                alert2.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if (!choice[0].isEmpty() && !choice[0].equals("No Favourites!")) {
+                            saveLocation(choice[0]);
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Click the star to add the current location as a favourite", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                alert2.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Cancelled
+                    }
+                });
+                alert2.show();
             }
         });
         alert.show();
@@ -258,6 +322,45 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             getTodayWeather();
             getLongTermWeather();
         }
+    }
+
+
+    private void saveFavourite() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        SharedPreferences.Editor editor = preferences.edit();
+        Boolean same = false;
+        String favList = preferences.getString("favourite", "No Favourites!");
+
+        if (favList.equals("No Favourites!")) {
+            favList = "";
+        }
+        final String[] stringList = favList.split(",");
+        recentCity = preferences.getString("city", Constants.DEFAULT_CITY);
+        if (stringList.length == 5)
+        {
+            Toast.makeText(getApplicationContext(),
+                    "You can only have 5 favourites!", Toast.LENGTH_LONG).show();
+            return;
+        }
+        for (String aStringList : stringList) {
+            if (recentCity.equals(aStringList)) {
+                same = true;
+            }
+        }
+        if (same) {
+            Toast.makeText(getApplicationContext(),
+                    "This location is already a favourite!", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (favList.equals("")) {
+            favList = recentCity;
+        } else {
+            favList += "," + recentCity;
+        }
+        editor.putString("favourite", favList);
+        editor.apply();
+        Toast.makeText(getApplicationContext(),
+                "Favourite Added = "+ recentCity, Toast.LENGTH_SHORT).show();
     }
 
     @SuppressLint("RestrictedApi")
@@ -283,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 about;
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.loadData(about, "text/html", "UTF-8");
-        alert.setView(webView, 32, 0, 32, 0);
+        alert.setView(webView,32,0,32,0);
         alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -409,6 +512,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return ParseResult.OK;
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateTodayWeatherUI() {
         try {
             if (todayWeather.getCountry().isEmpty()) {
@@ -422,8 +526,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         String city = todayWeather.getCity();
         String country = todayWeather.getCountry();
         DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(getApplicationContext());
-        getSupportActionBar().setTitle(city + (country.isEmpty() ? "" : ", " + country));
-
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(city + (country.isEmpty() ? "" : ", " + country));
+        }
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 
         // Temperature
@@ -612,8 +717,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        /*add in code to launch camera*/
         if (id == R.id.action_camera) {
-            /*NEED TO LAUNCH CAMERA OR CAMERA ACTIVITY*/
+            saveFavourite();
         }
         if (id == R.id.action_refresh) {
             if (isNetworkAvailable()) {
@@ -705,11 +811,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 // Explanation not needed, since user requests this them self
-
-            } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_ACCESS_FINE_LOCATION);
@@ -802,6 +906,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     /*FIND OUT WHY THESE SHOULD BE STATIC*/
+    @SuppressLint("StaticFieldLeak")
     class TodayWeatherTask extends GenericRequestTask {
         TodayWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
             super(context, activity, progressDialog);
@@ -838,6 +943,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+     @SuppressLint("StaticFieldLeak")
      class LongTermWeatherTask extends GenericRequestTask {
         LongTermWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
             super(context, activity, progressDialog);
@@ -859,6 +965,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     class ProvideCityNameTask extends GenericRequestTask {
 
         ProvideCityNameTask(Context context, MainActivity activity, ProgressDialog progressDialog) {
@@ -910,10 +1017,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
     /*WHERE SHOULD RETURN BE USED OR MAKE VOID*/
-    public static long saveLastUpdateTime(SharedPreferences sp) {
+    public static void saveLastUpdateTime(SharedPreferences sp) {
         Calendar now = Calendar.getInstance();
         sp.edit().putLong("lastUpdate", now.getTimeInMillis()).apply();
-        return now.getTimeInMillis();
+        now.getTimeInMillis();
     }
 
     private void updateLastUpdateTime() {

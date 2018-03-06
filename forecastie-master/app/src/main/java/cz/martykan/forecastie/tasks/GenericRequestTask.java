@@ -1,5 +1,6 @@
 package cz.martykan.forecastie.tasks;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -26,8 +27,11 @@ import cz.martykan.forecastie.activities.MainActivity;
 
 public abstract class GenericRequestTask extends AsyncTask<String, String, TaskOutput> {
 
+
     private ProgressDialog progressDialog;
+    @SuppressLint("StaticFieldLeak")
     private Context context;
+    @SuppressLint("StaticFieldLeak")
     private MainActivity activity;
     protected int loading = 0;
 
@@ -76,8 +80,7 @@ public abstract class GenericRequestTask extends AsyncTask<String, String, TaskO
                     InputStreamReader inputStreamReader = new InputStreamReader(urlConnection.getInputStream());
                     BufferedReader r = new BufferedReader(inputStreamReader);
 
-                    /*SEE WHERE THIS SHOULD BE USED OR REMOVE IT*/
-                    int responseCode = urlConnection.getResponseCode();
+                    urlConnection.getResponseCode();
                     String line;
                     while ((line = r.readLine()) != null) {
                         response.append(line).append("\n");
