@@ -718,7 +718,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         int id = item.getItemId();
 
         /*add in code to launch camera*/
-        if (id == R.id.action_camera) {
+//        if (id == R.id.action_camera) {
+//            saveFavourite();
+//        }
+        if (id == R.id.action_favorite) {
             saveFavourite();
         }
         if (id == R.id.action_refresh) {
@@ -756,6 +759,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     public static void initMappings() {
         if (mappingsInitialised)
