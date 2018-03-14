@@ -74,11 +74,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     // Time in milliseconds; only reload weather if last update is longer ago than this value
     private static final int NO_UPDATE_REQUIRED_THRESHOLD = 300000;
-
     private static Map<String, Integer> speedUnits = new HashMap<>(3);
     private static Map<String, Integer> pressUnits = new HashMap<>(3);
     private static boolean mappingsInitialised = false;
-
 
     Typeface weatherFont;
     Weather todayWeather = new Weather();
@@ -92,9 +90,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     TextView todaySunset;
     TextView lastUpdate;
     TextView todayIcon;
+
     ViewPager viewPager;
     TabLayout tabLayout;
-
     View appView;
 
     LocationManager locationManager;
@@ -102,12 +100,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     int theme;
     boolean destroyed = false;
+    public String recentCity = "";
 
     private List<Weather> longTermWeather = new ArrayList<>();
     private List<Weather> longTermTodayWeather = new ArrayList<>();
     private List<Weather> longTermTomorrowWeather = new ArrayList<>();
-
-    public String recentCity = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,8 +157,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         // Set autoupdater
         AlarmReceiver.setRecurringAlarm(this);
     }
-
-
 
     public WeatherRecyclerAdapter getAdapter(int id) {
         WeatherRecyclerAdapter weatherRecyclerAdapter;
@@ -439,16 +434,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         alert.show();
     }
 
+    /*
+        setWeatherIcon: This method takes integers representing the weather state and hour of day.
+        It checks for the type of weather based on those values to see icon.
+        icon is a string that is returned to the caller which describes the weather type.
+     */
     private String setWeatherIcon(int actualId, int hourOfDay) {
         int id = actualId / 100;
         String icon = "";
-        if (actualId == 800) {
+        if (actualId == 800) {  //If the weather is normal, is it day or night
             if (hourOfDay >= 7 && hourOfDay < 20) {
                 icon = this.getString(R.string.weather_sunny);
             } else {
                 icon = this.getString(R.string.weather_clear_night);
             }
-        } else {
+        } else {    //Conditional weather, find associated string representation
             switch (id) {
                 case 2:
                     icon = this.getString(R.string.weather_thunder);
@@ -470,14 +470,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     break;
             }
         }
-        return icon;
+        return icon;    //return the weather type string
     }
 
+    /*
+        getRainString: This method takes in a JSONObject representing the status of rain.
+        It checks to see if there is rain in the forecast of 3 hours, if not it checks if
+        there is rain in the 1 hour forecast.
+     */
     public static String getRainString(JSONObject rainObj) {
         String rain = "0";
         if (rainObj != null) {
             rain = rainObj.optString("3h", "fail");
-            if ("fail".equals(rain)) {
+            if ("fail".equals(rain)) { //If fails to get 3 hour forecast
                 rain = rainObj.optString("1h", "0");
             }
         }
@@ -698,11 +703,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return ParseResult.OK;
     }
 
+    /*
+        updateLongTermWeatherUI: This method puts the long term weather forecast together into a
+        single bundle.
+     */
     private void updateLongTermWeatherUI() {
         if (destroyed) {
             return;
         }
-
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         Bundle bundleToday = new Bundle();
@@ -735,6 +743,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         viewPager.setCurrentItem(currentPage, false);
     }
 
+    /*
+        isNetworkAvailable: This method uses a connectivity manager to check if the system has access
+        to a network. It returns a boolean stating if there is a network and the device is connected.
+     */
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = null;
@@ -744,6 +756,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    /*
+        shouldUpdate: This method checks if there is a valid lastUpdate, if the city has been changed,
+        and if the lastUpdate is old or not.
+     */
     private boolean shouldUpdate() {
         long lastUpdate = PreferenceManager.getDefaultSharedPreferences(this).getLong("lastUpdate", -1);
         boolean cityChanged = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("cityChanged", false);
@@ -757,6 +773,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return true;
     }
 
+    /*
+        onOptionsItemSelected: This method takes in a menuItem, it checks the id to see what the
+        correct response should be.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -803,7 +823,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return super.onOptionsItemSelected(item);
     }
 
-
+    /*
+        initMappings: This method initializes the speed and pressure units for the map activity.
+     */
     public static void initMappings() {
         if (mappingsInitialised)
             return;
@@ -822,6 +844,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return localize(sp, this, preferenceKey, defaultValueKey);
     }
 
+    /*
+        localize: This method converts the unit of speed and/or pressure to the unit chosen by the
+        user.
+     */
     public static String localize(SharedPreferences sp, Context context, String preferenceKey, String defaultValueKey) {
         String preferenceValue = sp.getString(preferenceKey, defaultValueKey);
         String result = preferenceValue;
@@ -837,6 +863,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return result;
     }
 
+    /*
+        getWindDirectionString: This method sets the format of the wind direction to the preference
+        chosen by the user.
+     */
     public static String getWindDirectionString(SharedPreferences sp, Context context, Weather weather) {
         try {
             if (Double.parseDouble(weather.getWind()) != 0) {
@@ -850,10 +880,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return "";
     }
 
+    /*
+        getCityByLocation: This method checks the location of the device through the network by GPS.
+        It then updates the location of the weather to the location of the device.
+     */
     void getCityByLocation() {
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -893,6 +926,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    /*
+        showLocationSettingsDialog: This method creates a dialog to tell the user how to enable the
+        location setting.
+        I do not think this method is used.
+     */
     private void showLocationSettingsDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setTitle(R.string.location_settings);
@@ -911,6 +949,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         alertDialog.show();
     }
 
+    /*
+        onRequestPermissionResult: This method takes in an integer representing the request code,
+        a string array of permissions and an integer array of granted results.
+        If the request code is valid(ie. Matches the constant) then it checks if the location services
+        were granted, if so it gets the city by location of the device.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -923,6 +967,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    /*
+        onLocationChanged: This method takes in the location, and collects the longitude and latitude
+        and then creates a task update city name.
+     */
     @Override
     public void onLocationChanged(Location location) {
         progressDialog.hide();
@@ -939,17 +987,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
     }
 
     /*FIND OUT WHY THESE SHOULD BE STATIC*/
@@ -1063,19 +1108,32 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             handleTaskOutput(output);
         }
     }
-    /*WHERE SHOULD RETURN BE USED OR MAKE VOID*/
+
+    /*
+        saveLastUpdateTime: This method takes in the sharedPreferences and puts the last update time
+        into the Long with "lastUpdate" key.
+     */
     public static void saveLastUpdateTime(SharedPreferences sp) {
         Calendar now = Calendar.getInstance();
         sp.edit().putLong("lastUpdate", now.getTimeInMillis()).apply();
         now.getTimeInMillis();
     }
 
+    /*
+        updateLastUpdateTime: This method gets the time of last update from shared preferences,
+        if fails then returns -1.
+     */
     private void updateLastUpdateTime() {
         updateLastUpdateTime(
                 PreferenceManager.getDefaultSharedPreferences(this).getLong("lastUpdate", -1)
         );
     }
 
+    /*
+        updateLastUpdateTime: This method takes in a time value representing the time of day in
+        milliseconds. It checks if the value is negative, which means invalid. Otherwise it sets the
+        textview for lastUpdate time to the formatted time for the current day.
+     */
     @SuppressLint("StringFormatInvalid")
     private void updateLastUpdateTime(long timeInMillis) {
         if (timeInMillis < 0) {
@@ -1086,6 +1144,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    /*
+        formatTimeWithDayIfNotToday: If the user is viewing a different day, possibly due to location.
+        This checks if the user is viewing the current days weather and if not it reformats the time.
+     */
     public static String formatTimeWithDayIfNotToday(Context context, long timeInMillis) {
         Calendar now = Calendar.getInstance();
         Calendar lastCheckedCal = new GregorianCalendar();
@@ -1101,6 +1163,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    /*
+        getTheme: This method checks what the user has chosen for
+        theme preference and sets it based on that value.
+     */
     private int getTheme(String themePref) {
         switch (themePref) {
             case "dark":
