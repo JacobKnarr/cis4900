@@ -489,6 +489,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return rain;
     }
 
+    /*
+        These next 3 methods take in a JSONObject that is parsed and stored accordingly.
+        If the method fails to get the JSONObject empty arrays are used as place holders.
+        Otherwise, the JSON is parsed through and stored into lists and arrays where it is used to
+        populate the UI.
+     */
     private ParseResult parseTodayJson(String result) {
         try {
             JSONObject reader = new JSONObject(result);
@@ -622,6 +628,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         todaySunset.setText(getString(R.string.sunset) + ": " + timeFormat.format(todayWeather.getSunset()));
         todayIcon.setText(todayWeather.getIcon());
     }
+
 
     public ParseResult parseLongTermJson(String result) {
         int i;
