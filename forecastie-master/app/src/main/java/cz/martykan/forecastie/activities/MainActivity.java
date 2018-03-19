@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -69,6 +70,7 @@ import cz.martykan.forecastie.widgets.DashClockWeatherExtension;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     protected static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     // Time in milliseconds; only reload weather if last update is longer ago than this value
     private static final int NO_UPDATE_REQUIRED_THRESHOLD = 300000;
@@ -717,10 +719,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /*add in code to launch camera*/
-//        if (id == R.id.action_camera) {
-//            saveFavourite();
-//        }
+        if (id == R.id.action_camera) {
+            dispatchTakePictureIntent();
+        }
         if (id == R.id.action_favorite) {
             saveFavourite();
         }
@@ -1068,6 +1069,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 return R.style.AppTheme_NoActionBar_Classic_Dark;
             default:
                 return R.style.AppTheme_NoActionBar;
+        }
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
 }
