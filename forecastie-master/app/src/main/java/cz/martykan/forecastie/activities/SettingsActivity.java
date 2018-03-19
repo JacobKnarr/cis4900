@@ -36,6 +36,7 @@ public class SettingsActivity extends PreferenceActivity
     // Thursday 2016-01-14 16:00:00
     Date SAMPLE_DATE = new Date(1452805200000L);
 
+    // Save the state of the application 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(getTheme(PreferenceManager.getDefaultSharedPreferences(this).getString("theme", "fresh")));
@@ -56,6 +57,7 @@ public class SettingsActivity extends PreferenceActivity
         addPreferencesFromResource(R.xml.prefs);
     }
 
+    // Show preferences when restarting idle app
     @Override
     public void onResume(){
         super.onResume();
@@ -74,6 +76,7 @@ public class SettingsActivity extends PreferenceActivity
         setListPreferenceSummary("theme");
     }
 
+    // Pauses the application and halts all services
     @Override
     public void onPause(){
         super.onPause();
@@ -81,6 +84,7 @@ public class SettingsActivity extends PreferenceActivity
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
 
+    // Switch statement that specifies which setting attribute is modified
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         switch (key) {
@@ -119,6 +123,7 @@ public class SettingsActivity extends PreferenceActivity
         }
     }
 
+    // Sends a request to server for permission to determine location
     private void requestReadLocationPermission() {
         System.out.println("Calling request location permission");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -134,6 +139,7 @@ public class SettingsActivity extends PreferenceActivity
         }
     }
 
+    // Specifies checkbox to setChecked when granted permission 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == MainActivity.MY_PERMISSIONS_ACCESS_FINE_LOCATION) {
@@ -146,8 +152,8 @@ public class SettingsActivity extends PreferenceActivity
         }
     }
 
+    // Workaround for CM privacy guard. Register for location updates in order for it to ask us for permission
     private void privacyGuardWorkaround() {
-        // Workaround for CM privacy guard. Register for location updates in order for it to ask us for permission
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         try {
             DummyLocationListener dummyLocationListener = new DummyLocationListener();
@@ -162,17 +168,20 @@ public class SettingsActivity extends PreferenceActivity
         }
     }
 
+    // Function to create list preferences summary
     private void setListPreferenceSummary(String preferenceKey) {
         ListPreference preference = (ListPreference) findPreference(preferenceKey);
         preference.setSummary(preference.getEntry());
     }
 
+    // Function to call when custom date is enabled
     private void setCustomDateEnabled() {
         SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
         Preference customDatePref = findPreference("dateFormatCustom");
         customDatePref.setEnabled("custom".equals(sp.getString("dateFormat", "")));
     }
 
+    // Updates the Date format for all weather instances
     private void updateDateFormatList() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         Resources res = getResources();
@@ -211,6 +220,7 @@ public class SettingsActivity extends PreferenceActivity
         setListPreferenceSummary("dateFormat");
     }
 
+    // Checks the API key to make sure it's valid and authentic
     private void checkKey(String key){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         if (sp.getString(key, "").equals("")){
@@ -218,6 +228,7 @@ public class SettingsActivity extends PreferenceActivity
         }
     }
 
+    // Function being called when user updates app theme 
     private int getTheme(String themePref) {
         switch (themePref) {
             case "dark":
