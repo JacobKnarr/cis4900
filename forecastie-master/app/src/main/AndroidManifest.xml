@@ -101,6 +101,11 @@
             </intent-filter>
         </receiver>
 
+        <!--google places api key-->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzklsajdflkajfasklaaklsfdjsakc"/>
+
         <activity
             android:name=".activities.MapActivity"
             android:parentActivityName=".activities.MainActivity"
