@@ -22,6 +22,8 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -114,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private List<Weather> longTermTomorrowWeather = new ArrayList<>();
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private AppBarLayout appBarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         tabLayout = findViewById(R.id.tabs);
 
         mSwipeRefreshLayout = findViewById(R.id.swiperefresh);
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
 
         destroyed = false;
 
@@ -186,6 +190,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 }
             }
         );
+
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+
+                if (Math.abs(verticalOffset)-appBarLayout.getTotalScrollRange() == 0)
+                {
+                    mSwipeRefreshLayout.setEnabled(false);
+                }
+                else
+                {
+                    mSwipeRefreshLayout.setEnabled(true);
+                }
+            }
+        });
     }
 
     public WeatherRecyclerAdapter getAdapter(int id) {
