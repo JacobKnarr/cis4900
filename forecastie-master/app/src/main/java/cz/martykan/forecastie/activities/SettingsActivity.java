@@ -121,6 +121,8 @@ public class SettingsActivity extends PreferenceActivity
             case "apiKey":
                 checkKey(key);
         }
+        setResult(RESULT_OK, null);
+
     }
 
     // Sends a request to server for permission to determine location

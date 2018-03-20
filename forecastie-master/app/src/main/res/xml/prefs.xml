@@ -99,10 +99,4 @@
             android:title="@string/setting_update_location_automatically" />
 
     </PreferenceCategory>
-    <PreferenceCategory android:title="favourites">
-        <ListPreference
-            android:key="favouritesList"
-            android:entries="@string/favourites_list"
-            android:title="MyFavouritesList"/>
-    </PreferenceCategory>
 </PreferenceScreen>

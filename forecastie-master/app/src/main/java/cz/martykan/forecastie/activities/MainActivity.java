@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -75,14 +76,13 @@ import cz.martykan.forecastie.widgets.DashClockWeatherExtension;
 
 public class MainActivity extends AppCompatActivity implements LocationListener{
     protected static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     // Time in milliseconds; only reload weather if last update is longer ago than this value
     private static final int NO_UPDATE_REQUIRED_THRESHOLD = 300000;
-
     private static Map<String, Integer> speedUnits = new HashMap<>(3);
     private static Map<String, Integer> pressUnits = new HashMap<>(3);
     private static boolean mappingsInitialised = false;
-
 
     Typeface weatherFont;
     Weather todayWeather = new Weather();
@@ -96,9 +96,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     TextView todaySunset;
     TextView lastUpdate;
     TextView todayIcon;
+
     ViewPager viewPager;
     TabLayout tabLayout;
-
     View appView;
 
     LocationManager locationManager;
@@ -106,12 +106,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     int theme;
     boolean destroyed = false;
+    public String recentCity = "";
 
     private List<Weather> longTermWeather = new ArrayList<>();
     private List<Weather> longTermTodayWeather = new ArrayList<>();
     private List<Weather> longTermTomorrowWeather = new ArrayList<>();
-
-    public String recentCity = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,6 +205,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+    /*
+        preloadWeather: This method checks if there is any weather data stored for the current location
+        and if not it calls the appropriate weatherTask to update the app data with current weather data
+     */
     private void preloadWeather() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 
@@ -219,52 +222,71 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+    /*  getTodayWeather: This method updates the weather for the current date and displays a progress dialog
+        to indicate the user on data being loaded
+     */
     private void getTodayWeather() {
         new TodayWeatherTask(this, this, progressDialog).execute();
     }
 
+    /*  getLongTermWeather: This method updates the long term weather and displays a progress dialog
+        to indicate the user on data being loaded
+     */
     private void getLongTermWeather() {
         new LongTermWeatherTask(this, this, progressDialog).execute();
     }
 
-// not being used at the moment
+
+    /*
+        searchCities: this method creates a dialog when the search icon is clicked/tapped
+        The dialog has a single textview in which the user inputs a city to view the weather of.
+        The user can update the location by selecting the 'OK' button.
+        The user can resume the current location by selecting the 'Cancel' button.
+        The user can view saved favourites by selecting the 'Favourites' button.
+        This creates a favourites dialog that is populated with the favourite locations of the user.
+        The user can remove a favourite by selecting the favourite to remove and selecting the 'Remove Favourite' button.
+     */
     @SuppressLint("RestrictedApi")
     private void searchCities() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle(this.getString(R.string.search_title));
         final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);  //The specifications of the searchDialog
         input.setMaxLines(1);
         input.setSingleLine(true);
         alert.setView(input,32,0,32,0);
+
+        /*  This button is used to change the location to the value entered in the textview by the user */
         alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String result = input.getText().toString();
                 if (!result.isEmpty()) {
-                    saveLocation(result);
+                    saveLocation(result);   //Calls saveLocation to update location based on value
                 }
             }
         });
+        /*  This button is used to close the dialog and resume current location */
         alert.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Cancelled
             }
         });
 
-        /*Creates a favourites dialog so the user can choose from favourites they have saved*/
+        /*  Creates a favourites dialog so the user can choose from favourites they have saved */
         alert.setNeutralButton(R.string.dialog_favourites, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                SharedPreferences preferences2 = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                SharedPreferences preferences2 = PreferenceManager.getDefaultSharedPreferences(MainActivity.this); //Get the default data of the app
                 final SharedPreferences.Editor editor = preferences2.edit();
                 AlertDialog.Builder alert2 = new AlertDialog.Builder(MainActivity.this);
                 alert2.setTitle(MainActivity.this.getString(R.string.favourites_title));
 
                 /*make this run through all 5 favourites, and restrict addition to 5*/
-                final String[] favList = {preferences2.getString("favourite", "No Favourites!")};
-                final String[] stringList = favList[0].split(","); // here is list
-                final String[] choice = {stringList[0]};
+                final String[] favList = {preferences2.getString("favourite", "No Favourites!")}; //Get the favourite string from app data
+                final String[] stringList = favList[0].split(",");  //Split the favourites string on commas
+                final String[] choice = {stringList[0]};    //set the default for UI to first favourite
 
+                /*  Create radio buttons for each favourite */
                 alert2.setSingleChoiceItems(stringList, 0, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -273,12 +295,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                         choice[0] = stringList[which];
                     }
                 });
+
+                /*  Creates a button 'Remove Favourite' that when selected removes the selected favourite */
                 alert2.setNeutralButton(R.string.remove_favourite, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(getApplicationContext(),
                                 "Favourite Removed = " + choice[0], Toast.LENGTH_LONG).show();
                         favList[0] = "";
+
+                        /* Builds a csv string that does not include the selected string to remove */
                         for (String favs : stringList) {
                             if (!favs.equals("") && !favs.equals(choice[0])) {
                                 if (favList[0].equals("")) {
@@ -291,10 +317,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                         if (favList[0].equals("")) {
                             favList[0] = "No Favourites!";
                         }
-                        editor.putString("favourite", favList[0]);
+                        editor.putString("favourite", favList[0]);  //Saves the csv string of favourites to app data/shared preferences
                         editor.apply();
                     }
                 });
+
+                /*  Updates the location based on the selected favourite */
                 alert2.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         if (!choice[0].isEmpty() && !choice[0].equals("No Favourites!")) {
@@ -316,6 +344,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         alert.show();
     }
 
+    /*
+        saveLocation: this method takes in a location string and if not the same as current location,
+        it updates the location and weather data.
+     */
     private void saveLocation(String result) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         recentCity = preferences.getString("city", Constants.DEFAULT_CITY);
@@ -324,14 +356,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         editor.putString("city", result);
         editor.apply();
 
-        if (!recentCity.equals(result)) {
+        if (!recentCity.equals(result)) { //If the location changed then update weather data and UI
             // New location, update weather
             getTodayWeather();
             getLongTermWeather();
         }
     }
 
-
+    /*
+        saveFavourite: this method adds the current location to the favourites string in the app data
+        when the user selects the Star/favourites icon
+     */
     private void saveFavourite() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         SharedPreferences.Editor editor = preferences.edit();
@@ -341,15 +376,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         if (favList.equals("No Favourites!")) {
             favList = "";
         }
-        final String[] stringList = favList.split(",");
+        final String[] stringList = favList.split(","); //Splits the favourites csv string
         recentCity = preferences.getString("city", Constants.DEFAULT_CITY);
-        if (stringList.length == 5)
+        if (stringList.length == 5)     //checks if they have 5 favourites, if so don't add any more
         {
             Toast.makeText(getApplicationContext(),
                     "You can only have 5 favourites!", Toast.LENGTH_LONG).show();
             return;
         }
-        for (String aStringList : stringList) {
+        for (String aStringList : stringList) {     //If the favourite already exists, don't add
             if (recentCity.equals(aStringList)) {
                 same = true;
             }
@@ -359,7 +394,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                     "This location is already a favourite!", Toast.LENGTH_LONG).show();
             return;
         }
-        if (favList.equals("")) {
+        if (favList.equals("")) {   //Otherwise add the favourite
             favList = recentCity;
         } else {
             favList += "," + recentCity;
@@ -370,6 +405,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 "Favourite Added = "+ recentCity, Toast.LENGTH_SHORT).show();
     }
 
+    /*
+        aboutDialog: This is a dialog created by the original developer to inform the user of the
+        type of application this is, the versions, and those involved.
+     */
     @SuppressLint("RestrictedApi")
     private void aboutDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -394,24 +433,29 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.loadData(about, "text/html", "UTF-8");
         alert.setView(webView,32,0,32,0);
+        /*  Closes the dialog */
         alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-
             }
         });
         alert.show();
     }
 
+    /*
+        setWeatherIcon: This method takes integers representing the weather state and hour of day.
+        It checks for the type of weather based on those values to see icon.
+        icon is a string that is returned to the caller which describes the weather type.
+     */
     private String setWeatherIcon(int actualId, int hourOfDay) {
         int id = actualId / 100;
         String icon = "";
-        if (actualId == 800) {
+        if (actualId == 800) {  //If the weather is normal, is it day or night
             if (hourOfDay >= 7 && hourOfDay < 20) {
                 icon = this.getString(R.string.weather_sunny);
             } else {
                 icon = this.getString(R.string.weather_clear_night);
             }
-        } else {
+        } else {    //Conditional weather, find associated string representation
             switch (id) {
                 case 2:
                     icon = this.getString(R.string.weather_thunder);
@@ -433,20 +477,31 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                     break;
             }
         }
-        return icon;
+        return icon;    //return the weather type string
     }
 
+    /*
+        getRainString: This method takes in a JSONObject representing the status of rain.
+        It checks to see if there is rain in the forecast of 3 hours, if not it checks if
+        there is rain in the 1 hour forecast.
+     */
     public static String getRainString(JSONObject rainObj) {
         String rain = "0";
         if (rainObj != null) {
             rain = rainObj.optString("3h", "fail");
-            if ("fail".equals(rain)) {
+            if ("fail".equals(rain)) { //If fails to get 3 hour forecast
                 rain = rainObj.optString("1h", "0");
             }
         }
         return rain;
     }
 
+    /*
+        These next 3 methods take in a JSONObject that is parsed and stored accordingly.
+        If the method fails to get the JSONObject empty arrays are used as place holders.
+        Otherwise, the JSON is parsed through and stored into lists and arrays where it is used to
+        populate the UI.
+     */
     private ParseResult parseTodayJson(String result) {
         try {
             JSONObject reader = new JSONObject(result);
@@ -581,6 +636,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         todayIcon.setText(todayWeather.getIcon());
     }
 
+
     public ParseResult parseLongTermJson(String result) {
         int i;
         try {
@@ -661,11 +717,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         return ParseResult.OK;
     }
 
+    /*
+        updateLongTermWeatherUI: This method puts the long term weather forecast together into a
+        single bundle.
+     */
     private void updateLongTermWeatherUI() {
         if (destroyed) {
             return;
         }
-
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         Bundle bundleToday = new Bundle();
@@ -698,6 +757,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         viewPager.setCurrentItem(currentPage, false);
     }
 
+    /*
+        isNetworkAvailable: This method uses a connectivity manager to check if the system has access
+        to a network. It returns a boolean stating if there is a network and the device is connected.
+     */
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = null;
@@ -707,6 +770,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    /*
+        shouldUpdate: This method checks if there is a valid lastUpdate, if the city has been changed,
+        and if the lastUpdate is old or not.
+     */
     private boolean shouldUpdate() {
         long lastUpdate = PreferenceManager.getDefaultSharedPreferences(this).getLong("lastUpdate", -1);
         boolean cityChanged = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("cityChanged", false);
@@ -720,14 +787,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         return true;
     }
 
+    /*
+        onOptionsItemSelected: This method takes in a menuItem, it checks the id to see what the
+        correct response should be.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /*add in code to launch camera*/
-//        if (id == R.id.action_camera) {
-//            saveFavourite();
-//        }
+        if (id == R.id.action_camera) {
+            dispatchTakePictureIntent();
+        }
         if (id == R.id.action_favorite) {
             saveFavourite();
         }
@@ -776,7 +846,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
         if (id == R.id.action_settings) {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, 2);
         }
         if (id == R.id.action_about) {
             aboutDialog();
@@ -785,11 +855,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         return super.onOptionsItemSelected(item);
     }
 
+
 //    this overrides the google place autocomplete listener
 //    when you click on a place in the autocomplete results,
 //    this is the thing that does stuff with the result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 2) {
+            if(resultCode==RESULT_OK){
+                Intent refresh = new Intent(this, MainActivity.class);
+                startActivity(refresh);
+                this.finish();
+            }
+        }
         if(requestCode == 1){
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
@@ -800,6 +878,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             }
         }
     }
+
+/*
+        initMappings: This method initializes the speed and pressure units for the map activity.
+     */
 
     public static void initMappings() {
         if (mappingsInitialised)
@@ -819,6 +901,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         return localize(sp, this, preferenceKey, defaultValueKey);
     }
 
+    /*
+        localize: This method converts the unit of speed and/or pressure to the unit chosen by the
+        user.
+     */
     public static String localize(SharedPreferences sp, Context context, String preferenceKey, String defaultValueKey) {
         String preferenceValue = sp.getString(preferenceKey, defaultValueKey);
         String result = preferenceValue;
@@ -834,6 +920,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         return result;
     }
 
+    /*
+        getWindDirectionString: This method sets the format of the wind direction to the preference
+        chosen by the user.
+     */
     public static String getWindDirectionString(SharedPreferences sp, Context context, Weather weather) {
         try {
             if (Double.parseDouble(weather.getWind()) != 0) {
@@ -847,10 +937,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return "";
     }
 
+    /*
+        getCityByLocation: This method checks the location of the device through the network by GPS.
+        It then updates the location of the weather to the location of the device.
+     */
     void getCityByLocation() {
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -890,6 +983,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+    /*
+        showLocationSettingsDialog: This method creates a dialog to tell the user how to enable the
+        location setting.
+        I do not think this method is used.
+     */
     private void showLocationSettingsDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setTitle(R.string.location_settings);
@@ -908,6 +1006,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         alertDialog.show();
     }
 
+    /*
+        onRequestPermissionResult: This method takes in an integer representing the request code,
+        a string array of permissions and an integer array of granted results.
+        If the request code is valid(ie. Matches the constant) then it checks if the location services
+        were granted, if so it gets the city by location of the device.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -920,6 +1024,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+    /*
+        onLocationChanged: This method takes in the location, and collects the longitude and latitude
+        and then creates a task update city name.
+     */
     @Override
     public void onLocationChanged(Location location) {
         progressDialog.hide();
@@ -936,17 +1044,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
     }
 
     /*FIND OUT WHY THESE SHOULD BE STATIC*/
@@ -1060,19 +1165,32 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             handleTaskOutput(output);
         }
     }
-    /*WHERE SHOULD RETURN BE USED OR MAKE VOID*/
+
+    /*
+        saveLastUpdateTime: This method takes in the sharedPreferences and puts the last update time
+        into the Long with "lastUpdate" key.
+     */
     public static void saveLastUpdateTime(SharedPreferences sp) {
         Calendar now = Calendar.getInstance();
         sp.edit().putLong("lastUpdate", now.getTimeInMillis()).apply();
         now.getTimeInMillis();
     }
 
+    /*
+        updateLastUpdateTime: This method gets the time of last update from shared preferences,
+        if fails then returns -1.
+     */
     private void updateLastUpdateTime() {
         updateLastUpdateTime(
                 PreferenceManager.getDefaultSharedPreferences(this).getLong("lastUpdate", -1)
         );
     }
 
+    /*
+        updateLastUpdateTime: This method takes in a time value representing the time of day in
+        milliseconds. It checks if the value is negative, which means invalid. Otherwise it sets the
+        textview for lastUpdate time to the formatted time for the current day.
+     */
     @SuppressLint("StringFormatInvalid")
     private void updateLastUpdateTime(long timeInMillis) {
         if (timeInMillis < 0) {
@@ -1083,6 +1201,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+    /*
+        formatTimeWithDayIfNotToday: If the user is viewing a different day, possibly due to location.
+        This checks if the user is viewing the current days weather and if not it reformats the time.
+     */
     public static String formatTimeWithDayIfNotToday(Context context, long timeInMillis) {
         Calendar now = Calendar.getInstance();
         Calendar lastCheckedCal = new GregorianCalendar();
@@ -1098,6 +1220,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+    /*
+        getTheme: This method checks what the user has chosen for
+        theme preference and sets it based on that value.
+     */
     private int getTheme(String themePref) {
         switch (themePref) {
             case "dark":
@@ -1108,6 +1234,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 return R.style.AppTheme_NoActionBar_Classic_Dark;
             default:
                 return R.style.AppTheme_NoActionBar;
+        }
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
 }
