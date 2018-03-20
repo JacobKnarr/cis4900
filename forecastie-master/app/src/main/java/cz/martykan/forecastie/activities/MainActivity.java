@@ -872,9 +872,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 saveLocation(place.getName().toString());
-                Toast.makeText(this, "place "+place.getName(),
-                        Toast.LENGTH_LONG).show();
-
             }
         }
     }
