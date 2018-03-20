@@ -39,6 +39,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,7 +72,8 @@ import cz.martykan.forecastie.utils.UnitConvertor;
 import cz.martykan.forecastie.widgets.AbstractWidgetProvider;
 import cz.martykan.forecastie.widgets.DashClockWeatherExtension;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+
+public class MainActivity extends AppCompatActivity implements LocationListener{
     protected static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
 
     // Time in milliseconds; only reload weather if last update is longer ago than this value
@@ -221,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         new LongTermWeatherTask(this, this, progressDialog).execute();
     }
 
+// not being used at the moment
     @SuppressLint("RestrictedApi")
     private void searchCities() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -742,7 +749,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             startActivity(intent);
         }
         if (id == R.id.action_search) {
-            searchCities();
+            int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+
+            try {
+                Intent intent =
+                        new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                                .build(this);
+                startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+            } catch (GooglePlayServicesRepairableException e) {
+                Toast.makeText(this, "broke google play services...1"+e.toString(),
+                        Toast.LENGTH_LONG).show();
+                // TODO: Handle the error.
+            } catch (GooglePlayServicesNotAvailableException e) {
+                Toast.makeText(this, "broke google play services...2",
+                        Toast.LENGTH_LONG).show();
+                // TODO: Handle the error.
+            }
+//            searchCities();
             return true;
         }
         if (id == R.id.action_location) {
@@ -760,6 +783,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return super.onOptionsItemSelected(item);
     }
 
+//    this overrides the google place autocomplete listener
+//    when you click on a place in the autocomplete results,
+//    this is the thing that does stuff with the result
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 1){
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                Toast.makeText(this, "place "+place.getName(),
+                        Toast.LENGTH_LONG).show();
+
+            }
+        }
+    }
 
     public static void initMappings() {
         if (mappingsInitialised)
