@@ -748,6 +748,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             Intent intent = new Intent(MainActivity.this, GraphActivity.class);
             startActivity(intent);
         }
+
+        // make google search intent ui come up
         if (id == R.id.action_search) {
             int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
@@ -791,6 +793,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         if(requestCode == 1){
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
+                saveLocation(place.getName().toString());
                 Toast.makeText(this, "place "+place.getName(),
                         Toast.LENGTH_LONG).show();
 
