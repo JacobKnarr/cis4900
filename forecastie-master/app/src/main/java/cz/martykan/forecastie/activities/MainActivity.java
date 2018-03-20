@@ -25,8 +25,10 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -112,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private List<Weather> longTermTodayWeather = new ArrayList<>();
     private List<Weather> longTermTomorrowWeather = new ArrayList<>();
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         PreferenceManager.setDefaultValues(this, R.xml.prefs, false);
@@ -152,6 +156,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabs);
 
+        mSwipeRefreshLayout = findViewById(R.id.swiperefresh);
+
         destroyed = false;
 
         initMappings();
@@ -162,6 +168,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
         // Set autoupdater
         AlarmReceiver.setRecurringAlarm(this);
+
+        /*
+         * Sets up a SwipeRefreshLayout.OnRefreshListener that is invoked when the user
+         * performs a swipe-to-refresh gesture.
+         */
+        mSwipeRefreshLayout.setOnRefreshListener(
+            new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    if (isNetworkAvailable()) {
+                        getTodayWeather();
+                        getLongTermWeather();
+                    } else {
+                        Snackbar.make(appView, getString(R.string.msg_connection_not_available), Snackbar.LENGTH_LONG).show();
+                    }
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+            }
+        );
     }
 
     public WeatherRecyclerAdapter getAdapter(int id) {
