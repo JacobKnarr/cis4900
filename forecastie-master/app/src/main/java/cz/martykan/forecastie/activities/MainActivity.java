@@ -751,7 +751,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
         if (id == R.id.action_settings) {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, 1);
         }
         if (id == R.id.action_about) {
             aboutDialog();
@@ -760,6 +760,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==RESULT_OK){
+            Intent refresh = new Intent(this, MainActivity.class);
+            startActivity(refresh);
+            this.finish();
+        }
+    }
 
     public static void initMappings() {
         if (mappingsInitialised)

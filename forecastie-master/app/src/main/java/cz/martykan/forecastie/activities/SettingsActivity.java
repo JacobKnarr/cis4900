@@ -117,6 +117,8 @@ public class SettingsActivity extends PreferenceActivity
             case "apiKey":
                 checkKey(key);
         }
+        setResult(RESULT_OK, null);
+
     }
 
     private void requestReadLocationPermission() {
