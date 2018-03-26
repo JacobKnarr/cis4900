@@ -155,7 +155,8 @@
     <string name="item_icon">o</string>
     <string name="item_temperature">0 °C</string>
     <string name="favourites_title">Favourites</string>
-    <string name="remove_favourite">Remove Favourite</string>
+    <string name="remove_favourite">Remove</string>
     <string name="favourites_list">London</string>
     <string name="dialog_favourites">Favourites</string>
+    <string name="save_favourite">Save</string>
 </resources>

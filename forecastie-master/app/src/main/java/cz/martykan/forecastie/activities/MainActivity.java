@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         tabLayout = findViewById(R.id.tabs);
 
         mSwipeRefreshLayout = findViewById(R.id.swiperefresh);
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
+        appBarLayout =  findViewById(R.id.app_bar_layout);
 
         destroyed = false;
 
@@ -172,36 +172,43 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         // Set autoupdater
         AlarmReceiver.setRecurringAlarm(this);
 
-        /*
-         * Sets up a SwipeRefreshLayout.OnRefreshListener that is invoked when the user
-         * performs a swipe-to-refresh gesture.
-         */
-        mSwipeRefreshLayout.setOnRefreshListener(
-            new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    if (isNetworkAvailable()) {
-                        getTodayWeather();
-                        getLongTermWeather();
-                    } else {
-                        Snackbar.make(appView, getString(R.string.msg_connection_not_available), Snackbar.LENGTH_LONG).show();
-                    }
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
-            }
-        );
+        //provides refresh functionality at top of the main activity
+        OffsetChangedListener();
+        refreshListener();
 
+    }
+
+    /*
+     * Sets up a SwipeRefreshLayout.OnRefreshListener that is invoked when the user
+     * performs a swipe-to-refresh gesture.
+     */
+    public void refreshListener () {
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        if (isNetworkAvailable()) {
+                            getTodayWeather();
+                            getLongTermWeather();
+                        } else {
+                            Snackbar.make(appView, getString(R.string.msg_connection_not_available), Snackbar.LENGTH_LONG).show();
+                        }
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+        );
+    }
+
+    public void OffsetChangedListener() {
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-
-                if (Math.abs(verticalOffset)-appBarLayout.getTotalScrollRange() == 0)
-                {
-                    mSwipeRefreshLayout.setEnabled(false);
+                if (verticalOffset == 0) {
+                    mSwipeRefreshLayout.setEnabled(true);
                 }
                 else
                 {
-                    mSwipeRefreshLayout.setEnabled(true);
+                    mSwipeRefreshLayout.setEnabled(false);
                 }
             }
         });
@@ -279,114 +286,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         new LongTermWeatherTask(this, this, progressDialog).execute();
     }
 
-
-    /*
-        searchCities: this method creates a dialog when the search icon is clicked/tapped
-        The dialog has a single textview in which the user inputs a city to view the weather of.
-        The user can update the location by selecting the 'OK' button.
-        The user can resume the current location by selecting the 'Cancel' button.
-        The user can view saved favourites by selecting the 'Favourites' button.
-        This creates a favourites dialog that is populated with the favourite locations of the user.
-        The user can remove a favourite by selecting the favourite to remove and selecting the 'Remove Favourite' button.
-     */
-    @SuppressLint("RestrictedApi")
-    private void searchCities() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle(this.getString(R.string.search_title));
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);  //The specifications of the searchDialog
-        input.setMaxLines(1);
-        input.setSingleLine(true);
-        alert.setView(input,32,0,32,0);
-
-        /*  This button is used to change the location to the value entered in the textview by the user */
-        alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String result = input.getText().toString();
-                if (!result.isEmpty()) {
-                    saveLocation(result);   //Calls saveLocation to update location based on value
-                }
-            }
-        });
-        /*  This button is used to close the dialog and resume current location */
-        alert.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Cancelled
-            }
-        });
-
-        /*  Creates a favourites dialog so the user can choose from favourites they have saved */
-        alert.setNeutralButton(R.string.dialog_favourites, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                SharedPreferences preferences2 = PreferenceManager.getDefaultSharedPreferences(MainActivity.this); //Get the default data of the app
-                final SharedPreferences.Editor editor = preferences2.edit();
-                AlertDialog.Builder alert2 = new AlertDialog.Builder(MainActivity.this);
-                alert2.setTitle(MainActivity.this.getString(R.string.favourites_title));
-
-                /*make this run through all 5 favourites, and restrict addition to 5*/
-                final String[] favList = {preferences2.getString("favourite", "No Favourites!")}; //Get the favourite string from app data
-                final String[] stringList = favList[0].split(",");  //Split the favourites string on commas
-                final String[] choice = {stringList[0]};    //set the default for UI to first favourite
-
-                /*  Create radio buttons for each favourite */
-                alert2.setSingleChoiceItems(stringList, 0, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(),
-                                "Favourite Chosen = " + stringList[which], Toast.LENGTH_SHORT).show();
-                        choice[0] = stringList[which];
-                    }
-                });
-
-                /*  Creates a button 'Remove Favourite' that when selected removes the selected favourite */
-                alert2.setNeutralButton(R.string.remove_favourite, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(),
-                                "Favourite Removed = " + choice[0], Toast.LENGTH_LONG).show();
-                        favList[0] = "";
-
-                        /* Builds a csv string that does not include the selected string to remove */
-                        for (String favs : stringList) {
-                            if (!favs.equals("") && !favs.equals(choice[0])) {
-                                if (favList[0].equals("")) {
-                                    favList[0] = favs;
-                                } else {
-                                    favList[0] += "," + favs;
-                                }
-                            }
-                        }
-                        if (favList[0].equals("")) {
-                            favList[0] = "No Favourites!";
-                        }
-                        editor.putString("favourite", favList[0]);  //Saves the csv string of favourites to app data/shared preferences
-                        editor.apply();
-                    }
-                });
-
-                /*  Updates the location based on the selected favourite */
-                alert2.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if (!choice[0].isEmpty() && !choice[0].equals("No Favourites!")) {
-                            saveLocation(choice[0]);
-                        } else {
-                            Toast.makeText(getApplicationContext(),
-                                    "Click the star to add the current location as a favourite", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-                alert2.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Cancelled
-                    }
-                });
-                alert2.show();
-            }
-        });
-        alert.show();
-    }
-
     /*
         saveLocation: this method takes in a location string and if not the same as current location,
         it updates the location and weather data.
@@ -407,45 +306,106 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     }
 
     /*
-        saveFavourite: this method adds the current location to the favourites string in the app data
-        when the user selects the Star/favourites icon
+        saveFavourite: Creates a favourites dialog so the user can choose from favourites they have saved.
+        The user can update the location by selecting the 'OK' button.
+        The user can save a new favourite by selecting the 'SAVE' button.
+        The user can remove a favourite by selecting the favourite to remove and selecting the 'Remove' button.
      */
     private void saveFavourite() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        SharedPreferences.Editor editor = preferences.edit();
-        Boolean same = false;
-        String favList = preferences.getString("favourite", "No Favourites!");
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        final SharedPreferences.Editor editor = preferences.edit();
+        final String[] favList = {preferences.getString("favourite", "No Favourites!")}; //Get the favourite string from app data
 
-        if (favList.equals("No Favourites!")) {
-            favList = "";
+        if (favList[0].equals("No Favourites!")) {
+            favList[0] = "";
         }
-        final String[] stringList = favList.split(","); //Splits the favourites csv string
+
+        final String[] stringList = favList[0].split(","); //Splits the favourites csv string
+        final String[] choice = {stringList[0]};    //set the default for UI to first favourite
         recentCity = preferences.getString("city", Constants.DEFAULT_CITY);
-        if (stringList.length == 5)     //checks if they have 5 favourites, if so don't add any more
-        {
-            Toast.makeText(getApplicationContext(),
-                    "You can only have 5 favourites!", Toast.LENGTH_LONG).show();
-            return;
-        }
-        for (String aStringList : stringList) {     //If the favourite already exists, don't add
-            if (recentCity.equals(aStringList)) {
-                same = true;
+
+        alert.setTitle(MainActivity.this.getString(R.string.favourites_title));
+
+        /*  Create radio buttons for each favourite */
+        alert.setSingleChoiceItems(stringList, 0, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),
+                        "Favourite Chosen = " + stringList[which], Toast.LENGTH_SHORT).show();
+                choice[0] = stringList[which];
             }
-        }
-        if (same) {
-            Toast.makeText(getApplicationContext(),
-                    "This location is already a favourite!", Toast.LENGTH_LONG).show();
-            return;
-        }
-        if (favList.equals("")) {   //Otherwise add the favourite
-            favList = recentCity;
-        } else {
-            favList += "," + recentCity;
-        }
-        editor.putString("favourite", favList);
-        editor.apply();
-        Toast.makeText(getApplicationContext(),
-                "Favourite Added = "+ recentCity, Toast.LENGTH_SHORT).show();
+        });
+
+        /*  Creates a button 'Remove Favourite' that when selected removes the selected favourite */
+        alert.setNeutralButton(R.string.remove_favourite, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),
+                        "Favourite Removed = " + choice[0], Toast.LENGTH_LONG).show();
+                favList[0] = "";
+
+                        /* Builds a csv string that does not include the selected string to remove */
+                for (String favs : stringList) {
+                    if (!favs.equals("") && !favs.equals(choice[0])) {
+                        if (favList[0].equals("")) {
+                            favList[0] = favs;
+                        } else {
+                            favList[0] += "," + favs;
+                        }
+                    }
+                }
+                if (favList[0].equals("")) {
+                    favList[0] = "No Favourites!";
+                }
+                editor.putString("favourite", favList[0]);  //Saves the csv string of favourites to app data/shared preferences
+                editor.apply();
+            }
+        });
+
+        /*  Updates the location based on the selected favourite */
+        alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (!choice[0].isEmpty() && !choice[0].equals("No Favourites!")) {
+                    saveLocation(choice[0]);
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Click the star to add the current location as a favourite", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        alert.setNegativeButton(R.string.save_favourite, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                Boolean same = false;
+                if (stringList.length == 5)     //checks if they have 5 favourites, if so don't add any more
+                {
+                    Toast.makeText(getApplicationContext(),
+                            "You can only have 5 favourites!", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    for (String aStringList : stringList) {     //If the favourite already exists, don't add
+                        if (recentCity.equals(aStringList)) {
+                            same = true;
+                        }
+                    }
+                    if (same) {
+                        Toast.makeText(getApplicationContext(),
+                                "This location is already a favourite!", Toast.LENGTH_LONG).show();
+                        return;
+                    } else if (favList[0].equals("")) {   //Otherwise add the favourite
+                        favList[0] = recentCity;
+                    } else {
+                        favList[0] += "," + recentCity;
+                    }
+                    editor.putString("favourite", favList[0]);
+                    editor.apply();
+                    Toast.makeText(getApplicationContext(),
+                            "Favourite Added = " + recentCity, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        alert.show();
     }
 
     /*
