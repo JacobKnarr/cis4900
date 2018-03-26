@@ -316,11 +316,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         final SharedPreferences.Editor editor = preferences.edit();
         final String[] favList = {preferences.getString("favourite", "No Favourites!")}; //Get the favourite string from app data
-
-        if (favList[0].equals("No Favourites!")) {
-            favList[0] = "";
-        }
-
         final String[] stringList = favList[0].split(","); //Splits the favourites csv string
         final String[] choice = {stringList[0]};    //set the default for UI to first favourite
         recentCity = preferences.getString("city", Constants.DEFAULT_CITY);
@@ -389,6 +384,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                             same = true;
                         }
                     }
+                    if (favList[0].equals("No Favourites!")) {
+                        favList[0] = "";
+                    }
                     if (same) {
                         Toast.makeText(getApplicationContext(),
                                 "This location is already a favourite!", Toast.LENGTH_LONG).show();
@@ -438,6 +436,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         alert.setView(webView,32,0,32,0);
         /*  Closes the dialog */
         alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        });
+        alert.show();
+    }
+
+    /*
+        cameraDialog: This is a dialog that allows the user to take or view pictures.
+     */
+    @SuppressLint("RestrictedApi")
+    private void cameraDialog() {
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Pictures");
+        /* Opens the Camera to take a picture */
+        alert.setPositiveButton(R.string.open_camera, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dispatchTakePictureIntent();
+            }
+        });
+        /*  Closes the dialog *****WILL OPEN PICTURE ACTIVITY****** */
+        alert.setNeutralButton(R.string.view_pictures, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
             }
         });
@@ -799,7 +819,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         int id = item.getItemId();
 
         if (id == R.id.action_camera) {
-            dispatchTakePictureIntent();
+            cameraDialog();
         }
         if (id == R.id.action_favorite) {
             saveFavourite();

@@ -159,4 +159,6 @@
     <string name="favourites_list">London</string>
     <string name="dialog_favourites">Favourites</string>
     <string name="save_favourite">Save</string>
+    <string name="open_camera">Open Camera</string>
+    <string name="view_pictures">View Pictures</string>
 </resources>
