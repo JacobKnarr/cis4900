@@ -10,6 +10,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.db.chart.Tools;
 import com.db.chart.model.LineSet;
@@ -79,7 +81,14 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     private void temperatureGraph() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GraphActivity.this);
         LineChartView lineChartView = findViewById(R.id.graph_temperature);
+
+        LinearLayout linearLayout = findViewById(R.id.tempLinearLayout);
+        TextView unit = new TextView(this);
+        unit.setText(prefs.getString("unit","°C"));
+        unit.setTextColor(Color.BLACK);
+        (linearLayout).addView(unit, 1);
 
         // Data
         LineSet dataset = new LineSet();
@@ -101,7 +110,6 @@ public class GraphActivity extends AppCompatActivity {
         dataset.setThickness(4);
 
         lineChartView.addData(dataset);
-
         // Grid
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
@@ -120,7 +128,14 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     private void rainGraph() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GraphActivity.this);
         LineChartView lineChartView = findViewById(R.id.graph_rain);
+
+        LinearLayout linearLayout = findViewById(R.id.rainLinearLayout);
+        TextView unit = new TextView(this);
+        unit.setText(prefs.getString("lengthUnit","mm"));
+        unit.setTextColor(Color.BLACK);
+        (linearLayout).addView(unit, 1);
 
         // Data
         LineSet dataset = new LineSet();
@@ -161,7 +176,14 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     private void pressureGraph() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GraphActivity.this);
         LineChartView lineChartView = findViewById(R.id.graph_pressure);
+
+        LinearLayout linearLayout = findViewById(R.id.pressLinearLayout);
+        TextView unit = new TextView(this);
+        unit.setText(prefs.getString("pressureUnit","hPa"));
+        unit.setTextColor(Color.BLACK);
+        (linearLayout).addView(unit, 1);
 
         // Data
         LineSet dataset = new LineSet();
