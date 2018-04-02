@@ -14,6 +14,7 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -59,7 +60,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+<<<<<<< HEAD
 import java.io.IOException;
+=======
+>>>>>>> b56b204a19fc586e0818fef73fadb2ff887f16df
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -86,8 +90,10 @@ import cz.martykan.forecastie.widgets.AbstractWidgetProvider;
 import cz.martykan.forecastie.widgets.DashClockWeatherExtension;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener{
+public class MainActivity extends AppCompatActivity implements LocationListener {
     protected static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
+    protected static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 2;
+    protected static final int MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 3;
     static final int REQUEST_IMAGE_CAPTURE = 3;
 
     // Time in milliseconds; only reload weather if last update is longer ago than this value
@@ -126,6 +132,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private AppBarLayout appBarLayout;
+
+    /*Variables related to opening the gallery to specific folder*/
+    private String SCAN_PATH ;
+    private static final String FILE_TYPE = "image/*";
+    private MediaScannerConnection conn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -468,6 +479,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         /*  Closes the dialog *****WILL OPEN PICTURE ACTIVITY****** */
         alert.setNeutralButton(R.string.view_pictures, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
+                dispatchShowGalleryIntent();
             }
         });
         alert.show();
@@ -1359,6 +1371,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+<<<<<<< HEAD
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(mCurrentPhotoPath);
@@ -1367,4 +1380,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         this.sendBroadcast(mediaScanIntent);
     }
 
+=======
+    private void dispatchShowGalleryIntent() {
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setType("image/*");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+>>>>>>> b56b204a19fc586e0818fef73fadb2ff887f16df
 }
+
