@@ -43,10 +43,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -844,22 +847,31 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
         // make google search intent ui come up
         if (id == R.id.action_search) {
-            int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
-            try {
-                Intent intent =
-                        new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-                                .build(this);
-                startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-            } catch (GooglePlayServicesRepairableException e) {
-                Toast.makeText(this, "broke google play services...1"+e.toString(),
-                        Toast.LENGTH_LONG).show();
-                // TODO: Handle the error.
-            } catch (GooglePlayServicesNotAvailableException e) {
-                Toast.makeText(this, "broke google play services...2",
-                        Toast.LENGTH_LONG).show();
-                // TODO: Handle the error.
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            Location location;
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    // Explanation not needed, since user requests this them self
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            MY_PERMISSIONS_ACCESS_FINE_LOCATION);
+                }
+
+            } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                makePlacesAutocomplete(location.getLongitude(), location.getLatitude());
+//                Toast.makeText(this, location.getLongitude()+" "+location.getLatitude(), Toast.LENGTH_LONG).show();
+            } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                makePlacesAutocomplete(location.getLongitude(), location.getLatitude());
+
+//                Toast.makeText(this, location.getLongitude()+" "+location.getLatitude(), Toast.LENGTH_LONG).show();
+            } else {
+                return false;
             }
+
 //            searchCities();
             return true;
         }
@@ -878,6 +890,33 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         return super.onOptionsItemSelected(item);
     }
 
+    protected void makePlacesAutocomplete(double longitude, double latitude){
+        int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+
+        LatLngBounds latLngBounds = new LatLngBounds(
+                new LatLng(latitude, longitude),
+                new LatLng(latitude + 3, longitude));
+
+        try {
+            //filter out only cities in results
+            AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                    .build();
+
+            Intent intent =
+                    new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                            .setBoundsBias(latLngBounds)
+                            .setFilter(typeFilter)
+                            .build(this);
+            startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+        } catch (GooglePlayServicesRepairableException e) {
+            Toast.makeText(this, "broke google play services",
+                    Toast.LENGTH_LONG).show();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Toast.makeText(this, "broke google play services",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
 
 //    this overrides the google place autocomplete listener
 //    when you click on a place in the autocomplete results,
@@ -894,7 +933,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         if(requestCode == 1){
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
-                saveLocation(place.getName().toString());
+
+                String[] cityCountry = place.getAddress().toString().split(", ");
+                if(cityCountry.length == 3){
+                    saveLocation(cityCountry[0] +","+ cityCountry[2]);
+                }else{
+                    saveLocation(cityCountry[0]);
+                }
+
             }
         }
     }
@@ -1059,6 +1105,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         Log.i("LOCATION (" + location.getProvider().toUpperCase() + ")", location.getLatitude() + ", " + location.getLongitude());
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
+
         new ProvideCityNameTask(this, this, progressDialog).execute("coords", Double.toString(latitude), Double.toString(longitude));
     }
 
