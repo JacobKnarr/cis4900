@@ -84,7 +84,7 @@ import cz.martykan.forecastie.widgets.AbstractWidgetProvider;
 import cz.martykan.forecastie.widgets.DashClockWeatherExtension;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener, MediaScannerConnection.MediaScannerConnectionClient {
+public class MainActivity extends AppCompatActivity implements LocationListener {
     protected static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
     protected static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 2;
     protected static final int MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 3;
@@ -473,17 +473,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         /*  Closes the dialog *****WILL OPEN PICTURE ACTIVITY****** */
         alert.setNeutralButton(R.string.view_pictures, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-//                Log.d("Path:", android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI.toString());
-//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("/storage/emulated/0/Pictures/"));
-//                startActivity(intent);
-
-
-//                dispatchShowGalleryIntent();
-                Intent intent = new Intent();
-                intent.setAction(android.content.Intent.ACTION_VIEW);
-                intent.setType("image/*");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                dispatchShowGalleryIntent();
             }
         });
         alert.show();
@@ -1109,16 +1099,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     getCityByLocation();
                 }
             }
-            case MY_PERMISSIONS_READ_EXTERNAL_STORAGE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    dispatchShowGalleryIntent();
-                }
-            }
-            case MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE : {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    dispatchShowGalleryIntent();
-                }
-            }
         }
     }
 
@@ -1344,74 +1324,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     private void dispatchShowGalleryIntent() {
-        /*Check for permissions to read the files*/
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("test", "NO READ PERMISSIONS");
-
-            /*Show permission request dialog*/
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-        }
-        else if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("test", "NO WRITE PERMISSIONS");
-
-            /*Show permission request dialog*/
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE);
-        }
-        else {
-//            Uri selectedUri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString());
-//            Intent intent = new Intent(Intent.ACTION_VIEW);
-//            intent.setDataAndType(selectedUri, "resource/folder");
-//            startActivity(intent);
-
-//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("/storage/emulated/0/Pictures/"));
-//                startActivity(intent);
-
-//            Log.d("Folder", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath());
-//            File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString());
-//            File[] fileList = folder.listFiles();
-//            for(int i=0;i<fileList.length;i++)
-//            {
-//                Log.d("all file path"+i, fileList[i].getAbsolutePath());
-//            }
-//            SCAN_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-//            Log.d("SCAN PATH", "Scan Path " + SCAN_PATH);
-//            startScan();
-        }
-    }
-
-    private void startScan()
-    {
-        Log.d("StartScan-Connected","success - "+conn);
-        if(conn!=null)
-        {
-            conn.disconnect();
-        }
-        conn = new MediaScannerConnection(this,this);
-        conn.connect();
-    }
-
-    @Override
-    public void onMediaScannerConnected() {
-        Log.d("onMediaScannerConnected","success - "+conn);
-        conn.scanFile(SCAN_PATH, FILE_TYPE);
-    }
-
-    @Override
-    public void onScanCompleted(String path, Uri uri) {
-        try {
-            Log.d("onScanCompleted","uri [" +uri + "] - success - "+conn);
-            if (uri != null)
-            {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(uri);
-                startActivity(intent);
-            }
-        } finally
-        {
-            conn.disconnect();
-            conn = null;
-        }
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setType("image/*");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }
+
