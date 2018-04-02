@@ -59,7 +59,7 @@ public class GraphActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.graph_toolbar);
         setSupportActionBar(toolbar);
-        if(getSupportActionBar() != null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         if (darkTheme) {
