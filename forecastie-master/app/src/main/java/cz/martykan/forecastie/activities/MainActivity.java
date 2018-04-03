@@ -60,10 +60,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-<<<<<<< HEAD
+//<<<<<<< HEAD
+//import java.io.IOException;
+//=======
+//>>>>>>> b56b204a19fc586e0818fef73fadb2ff887f16df
 import java.io.IOException;
-=======
->>>>>>> b56b204a19fc586e0818fef73fadb2ff887f16df
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -845,15 +846,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (id == R.id.action_favorite) {
             saveFavourite();
         }
-        if (id == R.id.action_refresh) {
-            if (isNetworkAvailable()) {
-                getTodayWeather();
-                getLongTermWeather();
-            } else {
-                Snackbar.make(appView, getString(R.string.msg_connection_not_available), Snackbar.LENGTH_LONG).show();
-            }
-            return true;
-        }
         if (id == R.id.action_map) {
             Intent intent = new Intent(MainActivity.this, MapActivity.class);
             startActivity(intent);
@@ -1371,7 +1363,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-<<<<<<< HEAD
+//<<<<<<< HEAD
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(mCurrentPhotoPath);
@@ -1380,7 +1372,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         this.sendBroadcast(mediaScanIntent);
     }
 
-=======
+//=======
     private void dispatchShowGalleryIntent() {
         Intent intent = new Intent();
         intent.setAction(android.content.Intent.ACTION_VIEW);
@@ -1388,6 +1380,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
->>>>>>> b56b204a19fc586e0818fef73fadb2ff887f16df
+//>>>>>>> b56b204a19fc586e0818fef73fadb2ff887f16df
 }
 
