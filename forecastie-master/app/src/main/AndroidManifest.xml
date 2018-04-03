@@ -30,7 +30,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/photos"></meta-data>
+                android:resource="@xml/photos"/>
         </provider>
         <activity
             android:name=".activities.SplashActivity"
