@@ -26,7 +26,6 @@ import android.provider.Settings;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -37,13 +36,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +68,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import cz.martykan.forecastie.AlarmReceiver;
@@ -92,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
     protected static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 2;
     protected static final int MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 3;
-    static final int REQUEST_IMAGE_CAPTURE = 3;
+    static final int REQUEST_TAKE_PHOTO = 3;
 
     // Time in milliseconds; only reload weather if last update is longer ago than this value
     private static final int NO_UPDATE_REQUIRED_THRESHOLD = 300000;
@@ -135,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private String SCAN_PATH ;
     private static final String FILE_TYPE = "image/*";
     private MediaScannerConnection conn;
+
+    private String mCurrentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -843,15 +843,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (id == R.id.action_favorite) {
             saveFavourite();
         }
-        if (id == R.id.action_refresh) {
-            if (isNetworkAvailable()) {
-                getTodayWeather();
-                getLongTermWeather();
-            } else {
-                Snackbar.make(appView, getString(R.string.msg_connection_not_available), Snackbar.LENGTH_LONG).show();
-            }
-            return true;
-        }
         if (id == R.id.action_map) {
             Intent intent = new Intent(MainActivity.this, MapActivity.class);
             startActivity(intent);
@@ -958,6 +949,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
 
             }
+        }
+        if(requestCode == 3) {
+            galleryAddPic();
+            Toast.makeText(getApplicationContext(),
+                    "The photos were saved to the device!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1320,18 +1316,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-//    private void dispatchTakePictureIntent() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//        }
-//    }
-
-    String mCurrentPhotoPath;
-
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
@@ -1345,7 +1332,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return image;
     }
 
-    static final int REQUEST_TAKE_PHOTO = 1;
+
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
