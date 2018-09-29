@@ -334,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         final SharedPreferences.Editor editor = preferences.edit();
         final String[] favList = {preferences.getString("favourite", "No Favourites!")}; //Get the favourite string from app data
-        final String[] stringList = favList[0].split(","); //Splits the favourites csv string
+        final String[] stringList = favList[0].split(";"); //Splits the favourites csv string
         final String[] choice = {stringList[0]};    //set the default for UI to first favourite
         recentCity = preferences.getString("city", Constants.DEFAULT_CITY);
 
@@ -364,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         if (favList[0].equals("")) {
                             favList[0] = favs;
                         } else {
-                            favList[0] += "," + favs;
+                            favList[0] += ";" + favs;
                         }
                     }
                 }
@@ -412,7 +412,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     } else if (favList[0].equals("")) {   //Otherwise add the favourite
                         favList[0] = recentCity;
                     } else {
-                        favList[0] += "," + recentCity;
+                        favList[0] += ";" + recentCity;
                     }
                     editor.putString("favourite", favList[0]);
                     editor.apply();
